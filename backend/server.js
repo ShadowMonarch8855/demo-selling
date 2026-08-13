@@ -235,7 +235,7 @@ app.delete('/api/users/:id', async (req, res) => {
 
 app.get('/api/payments', async (req, res) => {
   try {
-    const payments = await Payment.find({}).sort({ createdAt: -1 });
+    const payments = await Payment.find({ status: 'approved' }).sort({ createdAt: -1 });
     res.json(payments);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch payments' });
@@ -244,7 +244,11 @@ app.get('/api/payments', async (req, res) => {
 
 app.post('/api/payments', async (req, res) => {
   try {
-    const payment = new Payment(req.body);
+    const paymentData = req.body || {};
+    if (paymentData.status !== 'approved') {
+      return res.status(400).json({ error: 'Only approved payments can be stored' });
+    }
+    const payment = new Payment(paymentData);
     const saved = await payment.save();
     res.status(201).json(saved);
   } catch (err) {
@@ -254,7 +258,11 @@ app.post('/api/payments', async (req, res) => {
 
 app.put('/api/payments/:id', async (req, res) => {
   try {
-    const updated = await Payment.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
+    const updateData = req.body || {};
+    if (updateData.status && updateData.status !== 'approved') {
+      return res.status(400).json({ error: 'Only approved status is allowed' });
+    }
+    const updated = await Payment.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
     if (!updated) return res.status(404).json({ error: 'Payment not found' });
     res.json(updated);
   } catch (err) {

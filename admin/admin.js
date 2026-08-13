@@ -1,5 +1,5 @@
 // --- ADMIN CONFIG ---
-const API_BASE = (typeof window !== 'undefined' && window.ADMIN_API_BASE) || '';
+const API_BASE = (typeof window !== 'undefined' && window.ADMIN_API_BASE) || 'https://demo-selling.onrender.com';
 
 // --- ADMIN DATA ---
 const admin = {
@@ -115,7 +115,7 @@ const admin = {
     const totalOrders = this.orders.length;
     const totalProducts = this.products.length;
     const totalRevenue = this.orders
-      .filter(o => o.status === 'delivered' || o.status === 'approved')
+      .filter(o => (o.status === 'delivered' || o.status === 'approved') && o.paymentStatus === 'paid')
       .reduce((sum, o) => sum + (o.subtotal || 0), 0);
     const pendingOrders = this.orders.filter(o => o.status === 'pending').length;
     const deliveredOrders = this.orders.filter(o => o.status === 'delivered').length;
