@@ -390,7 +390,7 @@ const app = {
             let products = this.getProducts();
 
             // Apply search
-            const searchQuery = document.getElementById('search-input') ? .value.toLowerCase();
+            const searchQuery = document.getElementById('search-input')?.value.toLowerCase();
             if (searchQuery) {
                 products = products.filter(p =>
                     p.name.toLowerCase().includes(searchQuery) ||
@@ -405,10 +405,10 @@ const app = {
             }
 
             // Apply other filters
-            const sizeFilter = document.getElementById('filter-size') ? .value;
-            const colorFilter = document.getElementById('filter-color') ? .value;
-            const priceFilter = document.getElementById('filter-price') ? .value;
-            const sortFilter = document.getElementById('filter-sort') ? .value;
+            const sizeFilter = document.getElementById('filter-size')?.value;
+            const colorFilter = document.getElementById('filter-color')?.value;
+            const priceFilter = document.getElementById('filter-price')?.value;
+            const sortFilter = document.getElementById('filter-sort')?.value;
 
             if (sizeFilter && sizeFilter !== 'all') {
                 products = products.filter(p => p.sizes && p.sizes.includes(sizeFilter));
