@@ -1208,11 +1208,11 @@ const app = {
   },
 
   // --- AUTHENTICATION ---
-  setLoginTab(tab) {
+  setLoginTab(btn, tab) {
     document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.login-tab-content').forEach(t => t.classList.remove('active'));
     
-    event.target.classList.add('active');
+    btn.classList.add('active');
     document.getElementById(`login-tab-${tab}`).classList.add('active');
   },
 

@@ -65,8 +65,8 @@
       <div class="container login-page">
         <div class="login-card">
           <div class="login-tabs">
-            <button class="login-tab active" onclick="app.setLoginTab('login')">Login</button>
-            <button class="login-tab" onclick="app.setLoginTab('register')">Register</button>
+            <button class="login-tab active" onclick="app.setLoginTab(this, 'login')">Login</button>
+            <button class="login-tab" onclick="app.setLoginTab(this, 'register')">Register</button>
           </div>
           <div id="login-tab-login" class="login-tab-content active">
             <form onsubmit="app.login(event)">
