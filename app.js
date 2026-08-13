@@ -1315,7 +1315,7 @@ const app = {
     this.navigate('login');
   },
 
-  handleAuthClick() {
+  handleProfileClick() {
     if (this.user) {
       this.navigate('profile');
     } else {
@@ -1324,18 +1324,17 @@ const app = {
   },
 
   updateAuthUI() {
-    const authLabel = document.getElementById('header-auth-label');
-    const authBtn = document.getElementById('header-auth-btn');
+    const profileBtn = document.getElementById('header-profile-btn');
     
-    if (this.user) {
-      if (authLabel) authLabel.textContent = 'Logout';
-      if (authBtn) {
-        authBtn.onclick = () => this.logout();
-      }
-    } else {
-      if (authLabel) authLabel.textContent = 'Login';
-      if (authBtn) {
-        authBtn.onclick = () => this.navigate('login');
+    if (profileBtn) {
+      if (this.user) {
+        profileBtn.querySelector('.icon').textContent = '👤';
+        profileBtn.querySelector('.label').textContent = 'Profile';
+        profileBtn.onclick = () => this.navigate('profile');
+      } else {
+        profileBtn.querySelector('.icon').textContent = '👤';
+        profileBtn.querySelector('.label').textContent = 'Login';
+        profileBtn.onclick = () => this.navigate('login');
       }
     }
   },

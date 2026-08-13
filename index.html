@@ -20,9 +20,13 @@
           <button onclick="app.search()">Search</button>
         </div>
         <div class="header-actions">
-          <button class="header-btn" id="header-auth-btn" onclick="app.handleAuthClick()">
+          <button class="header-btn" onclick="app.navigate('home')">
+            <span class="icon">🏠</span>
+            <span class="label">Home</span>
+          </button>
+          <button class="header-btn" id="header-profile-btn" onclick="app.handleProfileClick()">
             <span class="icon">👤</span>
-            <span class="label" id="header-auth-label">Login</span>
+            <span class="label">Profile</span>
           </button>
           <button class="header-btn" onclick="app.navigate('wishlist')">
             <span class="icon">❤️</span>
