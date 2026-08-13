@@ -96,7 +96,8 @@ seedDefaults().catch(console.error);
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find({});
-    res.json(products);
+    const safe = products.map(p => ({ ...p.toJSON(), id: p._id?.toString?.() || p.id }));
+    res.json(safe);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch products' });
   }
@@ -104,9 +105,9 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).lean();
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
+    res.json({ ...product, id: product._id?.toString?.() || product.id });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch product' });
   }
@@ -116,7 +117,8 @@ app.post('/api/products', async (req, res) => {
   try {
     const product = new Product(req.body);
     const saved = await product.save();
-    res.status(201).json(saved);
+    const json = saved.toJSON();
+    res.status(201).json({ ...json, id: saved._id?.toString?.() || json.id });
   } catch (err) {
     res.status(500).json({ error: 'Failed to create product' });
   }
@@ -126,7 +128,8 @@ app.put('/api/products/:id', async (req, res) => {
   try {
     const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ error: 'Product not found' });
-    res.json(updated);
+    const json = updated.toJSON();
+    res.json({ ...json, id: updated._id?.toString?.() || json.id });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update product' });
   }
@@ -134,9 +137,26 @@ app.put('/api/products/:id', async (req, res) => {
 
 app.delete('/api/products/:id', async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Product id is required' });
+    }
+
+    let deleted = null;
+    try {
+      deleted = await Product.findByIdAndDelete(id);
+    } catch (err) {
+      console.error('Delete product DB error:', err);
+      return res.status(400).json({ error: 'Invalid product id' });
+    }
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
     res.json({ success: true });
   } catch (err) {
+    console.error('Delete product error:', err);
     res.status(500).json({ error: 'Failed to delete product' });
   }
 });
