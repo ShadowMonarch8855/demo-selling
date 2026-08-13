@@ -93,10 +93,19 @@ seedDefaults().catch(console.error);
 
 // ==================== PRODUCTS API ====================
 
+const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+
+const productQuery = (id) => {
+  if (isValidObjectId(id)) {
+    return { $or: [{ _id: id }, { id: id }] };
+  }
+  return { id: Number.isNaN(Number(id)) ? id : Number(id) };
+};
+
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await Product.find({});
-    const safe = products.map(p => ({ ...p.toJSON(), id: p._id?.toString?.() || p.id }));
+    const products = await Product.find({}).lean();
+    const safe = products.map((p) => ({ ...p, id: p._id?.toString?.() || p.id }));
     res.json(safe);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -105,7 +114,7 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).lean();
+    const product = await Product.findOne(productQuery(req.params.id)).lean();
     if (!product) return res.status(404).json({ error: 'Product not found' });
     res.json({ ...product, id: product._id?.toString?.() || product.id });
   } catch (err) {
@@ -126,7 +135,7 @@ app.post('/api/products', async (req, res) => {
 
 app.put('/api/products/:id', async (req, res) => {
   try {
-    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await Product.findOneAndUpdate(productQuery(req.params.id), req.body, { new: true });
     if (!updated) return res.status(404).json({ error: 'Product not found' });
     const json = updated.toJSON();
     res.json({ ...json, id: updated._id?.toString?.() || json.id });
@@ -142,14 +151,7 @@ app.delete('/api/products/:id', async (req, res) => {
       return res.status(400).json({ error: 'Product id is required' });
     }
 
-    let deleted = null;
-    try {
-      deleted = await Product.findByIdAndDelete(id);
-    } catch (err) {
-      console.error('Delete product DB error:', err);
-      return res.status(400).json({ error: 'Invalid product id' });
-    }
-
+    const deleted = await Product.findOneAndDelete(productQuery(id));
     if (!deleted) {
       return res.status(404).json({ error: 'Product not found' });
     }
