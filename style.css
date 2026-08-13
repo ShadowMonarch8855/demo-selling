@@ -1879,3 +1879,91 @@ input, select, textarea {
   margin-bottom: 8px;
   color: #212121;
 }
+
+/* --- LOGIN PAGE --- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 40px 20px;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.login-tabs {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.login-tab {
+  flex: 1;
+  padding: 16px;
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: #878787;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-tab.active {
+  color: #2874f0;
+  border-bottom: 2px solid #2874f0;
+}
+
+.login-tab-content {
+  display: none;
+  padding: 24px;
+}
+
+.login-tab-content.active {
+  display: block;
+}
+
+.login-card .form-group {
+  margin-bottom: 16px;
+}
+
+.login-card .form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #212121;
+}
+
+.login-card .form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.login-card .form-group input:focus {
+  border-color: #2874f0;
+  box-shadow: 0 0 0 2px rgba(40,116,240,0.1);
+}
+
+.login-card .save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2874f0;
+  color: #fff;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+.login-card .save-btn:hover {
+  background: #1a5fb4;
+}

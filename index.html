@@ -20,9 +20,9 @@
           <button onclick="app.search()">Search</button>
         </div>
         <div class="header-actions">
-          <button class="header-btn" onclick="app.navigate('profile')">
+          <button class="header-btn" id="header-auth-btn" onclick="app.handleAuthClick()">
             <span class="icon">👤</span>
-            <span class="label">Profile</span>
+            <span class="label" id="header-auth-label">Login</span>
           </button>
           <button class="header-btn" onclick="app.navigate('wishlist')">
             <span class="icon">❤️</span>
@@ -60,8 +60,54 @@
 
   <!-- Main Content Area -->
   <main id="main-content">
+    <!-- Login Page -->
+    <div id="page-login" class="page active">
+      <div class="container login-page">
+        <div class="login-card">
+          <div class="login-tabs">
+            <button class="login-tab active" onclick="app.setLoginTab('login')">Login</button>
+            <button class="login-tab" onclick="app.setLoginTab('register')">Register</button>
+          </div>
+          <div id="login-tab-login" class="login-tab-content active">
+            <form onsubmit="app.login(event)">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" required>
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" required>
+              </div>
+              <button type="submit" class="save-btn" style="width:100%">Login</button>
+            </form>
+          </div>
+          <div id="login-tab-register" class="login-tab-content">
+            <form onsubmit="app.register(event)">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" required>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" required>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="reg-phone" required>
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reg-password" required>
+              </div>
+              <button type="submit" class="save-btn" style="width:100%">Register</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Home Page -->
-    <div id="page-home" class="page active">
+    <div id="page-home" class="page">
       <!-- Hero Banner -->
       <section class="hero-banner">
         <div class="hero-slider">

@@ -274,14 +274,21 @@ const app = {
     initData();
     this.loadData();
     await this.loadProducts();
-    this.renderProducts();
-    this.updateBadges();
-    this.startHeroSlider();
     
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       this.user = JSON.parse(savedUser);
-      this.updateProfileUI();
+    }
+    
+    this.updateAuthUI();
+    
+    // If not logged in, show login page
+    if (!this.user) {
+      this.navigate('login');
+    } else {
+      this.renderProducts();
+      this.updateBadges();
+      this.startHeroSlider();
     }
     
     document.addEventListener('keydown', (e) => {
@@ -329,6 +336,47 @@ const app = {
     localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
     localStorage.setItem('orders', JSON.stringify(this.orders));
     localStorage.setItem('addresses', JSON.stringify(this.addresses));
+  },
+
+  navigate(page) {
+    this.currentPage = page;
+    
+    const protectedPages = ['cart', 'wishlist', 'orders', 'checkout', 'profile', 'tracking'];
+    if (protectedPages.includes(page) && !this.user) {
+      this.showToast('Please login first', 'error');
+      page = 'login';
+    }
+    
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(`page-${page}`);
+    if (target) {
+      target.classList.add('active');
+    }
+    
+    this.closeModal();
+    
+    switch(page) {
+      case 'home':
+        this.renderProducts();
+        break;
+      case 'cart':
+        this.renderCart();
+        break;
+      case 'wishlist':
+        this.renderWishlist();
+        break;
+      case 'orders':
+        this.renderOrders();
+        break;
+      case 'checkout':
+        this.renderCheckout();
+        break;
+      case 'profile':
+        this.renderProfile();
+        break;
+    }
+    
+    window.scrollTo(0, 0);
   },
 
   getProducts() {
@@ -1157,10 +1205,130 @@ const app = {
     setTimeout(() => {
       toast.remove();
     }, 3000);
+  },
+
+  // --- AUTHENTICATION ---
+  setLoginTab(tab) {
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.login-tab-content').forEach(t => t.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(`login-tab-${tab}`).classList.add('active');
+  },
+
+  async register(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const phone = document.getElementById('reg-phone').value;
+    const password = document.getElementById('reg-password').value;
+    
+    if (!name || !email || !phone || !password) {
+      this.showToast('Please fill all fields', 'error');
+      return;
+    }
+    
+    // Save user locally
+    const user = { name, email, phone, joined: new Date().toISOString().split('T')[0] };
+    
+    if (API_BASE) {
+      try {
+        await apiCall('/api/users', {
+          method: 'POST',
+          body: JSON.stringify(user)
+        });
+      } catch (err) {
+        console.warn('Failed to register on server:', err);
+      }
+    }
+    
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.user = user;
+    this.updateAuthUI();
+    this.showToast('Registration successful!', 'success');
+    this.navigate('home');
+  },
+
+  async login(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+      this.showToast('Please enter email and password', 'error');
+      return;
+    }
+    
+    // For demo: accept any login or fetch from API
+    let user = null;
+    
+    if (API_BASE) {
+      try {
+        const users = await apiCall('/api/users');
+        user = users.find(u => u.email === email);
+      } catch (err) {
+        console.warn('Failed to fetch users from server:', err);
+      }
+    }
+    
+    // If user not found in API, create a local user
+    if (!user) {
+      user = {
+        name: email.split('@')[0],
+        email: email,
+        phone: '9876543210',
+        joined: new Date().toISOString().split('T')[0]
+      };
+    }
+    
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.user = user;
+    this.updateAuthUI();
+    this.showToast('Login successful!', 'success');
+    this.navigate('home');
+  },
+
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.user = null;
+    this.updateAuthUI();
+    this.showToast('Logged out successfully', 'success');
+    this.navigate('login');
+  },
+
+  handleAuthClick() {
+    if (this.user) {
+      this.navigate('profile');
+    } else {
+      this.navigate('login');
+    }
+  },
+
+  updateAuthUI() {
+    const authLabel = document.getElementById('header-auth-label');
+    const authBtn = document.getElementById('header-auth-btn');
+    
+    if (this.user) {
+      if (authLabel) authLabel.textContent = 'Logout';
+      if (authBtn) {
+        authBtn.onclick = () => this.logout();
+      }
+    } else {
+      if (authLabel) authLabel.textContent = 'Login';
+      if (authBtn) {
+        authBtn.onclick = () => this.navigate('login');
+      }
+    }
+  },
+
+  isLoggedIn() {
+    return !!this.user;
   }
 };
 
 // Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-  app.init();
+document.addEventListener('DOMContentLoaded', async () => {
+  await app.init();
 });
