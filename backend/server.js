@@ -420,7 +420,10 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  res.sendFile(path.join(__dirname, '..', 'admin', 'admin.html'));
+  if (req.path.startsWith('/admin')) {
+    return res.sendFile(path.join(__dirname, '..', 'admin', 'admin.html'));
+  }
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // Start server

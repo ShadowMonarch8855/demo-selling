@@ -24,12 +24,13 @@ const admin = {
 
   async api(url, options = {}) {
     try {
+      const { headers: optionsHeaders, ...restOptions } = options;
       const response = await fetch(`${API_BASE}${url}`, {
         headers: {
           'Content-Type': 'application/json',
-          ...options.headers
+          ...optionsHeaders
         },
-        ...options
+        ...restOptions
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ error: 'Request failed' }));
@@ -254,8 +255,8 @@ const admin = {
         <td>★ ${product.rating}</td>
         <td>
           <div class="action-btns">
-            <button class="action-btn edit" onclick="admin.editProduct(${product.id})">Edit</button>
-            <button class="action-btn delete" onclick="admin.deleteProduct(${product.id})">Delete</button>
+            <button class="action-btn edit" onclick="admin.editProduct('${product.id}')">Edit</button>
+            <button class="action-btn delete" onclick="admin.deleteProduct('${product.id}')">Delete</button>
           </div>
         </td>
       </tr>
@@ -270,7 +271,7 @@ const admin = {
   },
 
   editProduct(productId) {
-    const product = this.products.find(p => p.id === productId);
+    const product = this.products.find(p => p.id == productId);
     if (!product) return;
     
     document.getElementById('prod-id').value = product.id;
@@ -441,7 +442,7 @@ const admin = {
   },
 
   async showOrderModal(orderId) {
-    const order = this.orders.find(o => o.id === orderId);
+    const order = this.orders.find(o => o.id == orderId);
     if (!order) return;
     
     document.getElementById('order-action-id').value = order.id;
@@ -487,7 +488,7 @@ const admin = {
   },
 
   showRazorpayModal(orderId) {
-    const order = this.orders.find(o => o.id === orderId);
+    const order = this.orders.find(o => o.id == orderId);
     if (!order) return;
     
     document.getElementById('razorpay-order-id').value = order.id;
@@ -610,9 +611,9 @@ const admin = {
       });
       
       // Also update order status
-      const payment = this.payments.find(p => p.id === paymentId);
+      const payment = this.payments.find(p => p.id == paymentId);
       if (payment) {
-        const order = this.orders.find(o => o.id === payment.orderId);
+        const order = this.orders.find(o => o.id == payment.orderId);
         if (order && order.status === 'pending') {
           await this.api(`/api/orders/${order.id}`, {
             method: 'PUT',
@@ -651,8 +652,8 @@ const admin = {
           <td>${userOrders}</td>
           <td>
             <div class="action-btns">
-              <button class="action-btn view" onclick="admin.viewUser(${user.id})">View</button>
-              <button class="action-btn delete" onclick="admin.deleteUser(${user.id})">Delete</button>
+              <button class="action-btn view" onclick="admin.viewUser('${user.id}')">View</button>
+              <button class="action-btn delete" onclick="admin.deleteUser('${user.id}')">Delete</button>
             </div>
           </td>
         </tr>
@@ -661,7 +662,7 @@ const admin = {
   },
 
   viewUser(userId) {
-    const user = this.users.find(u => u.id === userId);
+    const user = this.users.find(u => u.id == userId);
     if (!user) return;
     
     const userOrders = this.orders.filter(o => o.address?.name === user.name);

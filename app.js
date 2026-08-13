@@ -236,12 +236,13 @@ function initData() {
 // API helper
 async function apiCall(url, options = {}) {
   try {
+    const { headers: optionsHeaders, ...restOptions } = options;
     const response = await fetch(`${API_BASE}${url}`, {
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers
+        ...optionsHeaders
       },
-      ...options
+      ...restOptions
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
@@ -461,7 +462,7 @@ const app = {
       const inWishlist = this.wishlist.includes(product.id);
       
       card.innerHTML = `
-        <div class="wishlist-icon ${inWishlist ? 'in-wishlist' : ''}" onclick="app.toggleWishlist(${product.id})">
+        <div class="wishlist-icon ${inWishlist ? 'in-wishlist' : ''}" onclick="app.toggleWishlist('${product.id}')">
           ${inWishlist ? '❤️' : '🤍'}
         </div>
         <img src="${product.images[0]}" alt="${product.name}" loading="lazy">
@@ -477,7 +478,7 @@ const app = {
             <span class="rating-badge">${product.rating}</span>
             <span>★</span>
           </div>
-          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart(${product.id})">ADD TO CART</button>
+          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart('${product.id}')">ADD TO CART</button>
         </div>
       `;
       grid.appendChild(card);
@@ -486,7 +487,7 @@ const app = {
 
   showProductModal(productId) {
     const products = this.getProducts();
-    const product = products.find(p => p.id === productId);
+    const product = products.find(p => p.id == productId);
     if (!product) return;
     
     const modalBody = document.getElementById('product-modal-body');
@@ -531,8 +532,8 @@ const app = {
           </div>
         </div>
         <div class="detail-actions">
-          <button class="btn-primary" onclick="app.addToCart(${product.id}); app.closeModal();">ADD TO CART</button>
-          <button class="btn-secondary" onclick="app.toggleWishlist(${product.id})">
+          <button class="btn-primary" onclick="app.addToCart('${product.id}'); app.closeModal();">ADD TO CART</button>
+          <button class="btn-secondary" onclick="app.toggleWishlist('${product.id}')">
             ${inWishlist ? '❤️ WISHLISTED' : '🤍 ADD TO WISHLIST'}
           </button>
         </div>
@@ -588,10 +589,10 @@ const app = {
   // --- CART ---
   addToCart(productId) {
     const products = this.getProducts();
-    const product = products.find(p => p.id === productId);
+    const product = products.find(p => p.id == productId);
     if (!product) return;
     
-    const existingItem = this.cart.find(item => item.id === productId);
+    const existingItem = this.cart.find(item => item.id == productId);
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
@@ -608,14 +609,14 @@ const app = {
   },
 
   removeFromCart(productId) {
-    this.cart = this.cart.filter(item => item.id !== productId);
+    this.cart = this.cart.filter(item => item.id != productId);
     this.saveData();
     this.updateBadges();
     this.renderCart();
   },
 
   updateCartQuantity(productId, delta) {
-    const item = this.cart.find(item => item.id === productId);
+    const item = this.cart.find(item => item.id == productId);
     if (item) {
       item.quantity += delta;
       if (item.quantity <= 0) {
@@ -651,11 +652,11 @@ const app = {
           <div class="cart-item-title">${item.name}</div>
           <div class="cart-item-price">₹${item.price}</div>
           <div class="cart-item-qty">
-            <button class="qty-btn" onclick="app.updateCartQuantity(${item.id}, -1)">-</button>
+            <button class="qty-btn" onclick="app.updateCartQuantity('${item.id}', -1)">-</button>
             <span class="qty-value">${item.quantity}</span>
-            <button class="qty-btn" onclick="app.updateCartQuantity(${item.id}, 1)">+</button>
+            <button class="qty-btn" onclick="app.updateCartQuantity('${item.id}', 1)">+</button>
           </div>
-          <button class="cart-item-remove" onclick="app.removeFromCart(${item.id})">REMOVE</button>
+          <button class="cart-item-remove" onclick="app.removeFromCart('${item.id}')">REMOVE</button>
         </div>
       </div>
     `).join('');
@@ -684,7 +685,7 @@ const app = {
 
   // --- WISHLIST ---
   toggleWishlist(productId) {
-    const index = this.wishlist.indexOf(productId);
+    const index = this.wishlist.findIndex(id => id == productId);
     if (index > -1) {
       this.wishlist.splice(index, 1);
       this.showToast('Removed from wishlist', 'success');
@@ -708,7 +709,7 @@ const app = {
     const grid = document.getElementById('wishlist-grid');
     if (!grid) return;
     
-    const products = this.getProducts().filter(p => this.wishlist.includes(p.id));
+    const products = this.getProducts().filter(p => this.wishlist.some(id => id == p.id));
     
     if (products.length === 0) {
       grid.innerHTML = '<div class="empty-state"><div class="empty-icon">❤️</div><h3>Your wishlist is empty</h3><p>Save items you like for later</p></div>';
@@ -716,8 +717,8 @@ const app = {
     }
     
     grid.innerHTML = products.map(product => `
-      <div class="product-card" onclick="app.showProductModal(${product.id})">
-        <div class="wishlist-icon in-wishlist" onclick="event.stopPropagation(); app.toggleWishlist(${product.id})">❤️</div>
+      <div class="product-card" onclick="app.showProductModal('${product.id}')">
+        <div class="wishlist-icon in-wishlist" onclick="event.stopPropagation(); app.toggleWishlist('${product.id}')">❤️</div>
         <img src="${product.images[0]}" alt="${product.name}" loading="lazy">
         <div class="product-info">
           <div class="product-category">${product.category}</div>
@@ -731,7 +732,7 @@ const app = {
             <span class="rating-badge">${product.rating}</span>
             <span>★</span>
           </div>
-          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart(${product.id})">ADD TO CART</button>
+          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart('${product.id}')">ADD TO CART</button>
         </div>
       </div>
     `).join('');
@@ -906,7 +907,7 @@ const app = {
   },
 
   showTracking(orderId) {
-    const order = this.orders.find(o => o.id === orderId);
+    const order = this.orders.find(o => o.id == orderId);
     if (!order) return;
     
     const statuses = ['pending', 'approved', 'shipped', 'delivered'];
