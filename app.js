@@ -641,7 +641,7 @@ const app = {
     
     const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const discount = this.cart.reduce((sum, item) => sum + ((item.mrp - item.price) * item.quantity), 0);
-    const delivery = subtotal > 999 ? 0 : 50;
+    const delivery = subtotal > 999 ? 0 : 10;
     const total = subtotal + delivery;
     
     list.innerHTML = this.cart.map(item => `
