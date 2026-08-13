@@ -1908,6 +1908,7 @@ input, select, textarea {
   padding: 16px;
   background: none;
   border: none;
+  border-bottom: 2px solid transparent;
   font-weight: 600;
   color: #878787;
   cursor: pointer;
@@ -1916,7 +1917,7 @@ input, select, textarea {
 
 .login-tab.active {
   color: #2874f0;
-  border-bottom: 2px solid #2874f0;
+  border-bottom-color: #2874f0;
 }
 
 .login-tab-content {

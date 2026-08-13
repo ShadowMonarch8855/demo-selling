@@ -286,6 +286,7 @@ const app = {
             if (!this.user) {
                 this.navigate('login');
             } else {
+                this.navigate('home');
                 this.renderProducts();
                 this.updateBadges();
                 this.startHeroSlider();
