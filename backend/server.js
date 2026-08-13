@@ -81,9 +81,9 @@ async function seedDefaults() {
   const userCount = await User.countDocuments();
   if (userCount === 0) {
     await User.insertMany([
-      { id: 1, name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', joined: '2025-01-15', totalOrders: 3 },
-      { id: 2, name: 'Priya Patel', email: 'priya@example.com', phone: '9876543211', joined: '2025-02-20', totalOrders: 5 },
-      { id: 3, name: 'Amit Kumar', email: 'amit@example.com', phone: '9876543212', joined: '2025-03-10', totalOrders: 2 }
+      { name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', password: 'rahul123', joined: '2025-01-15', totalOrders: 3 },
+      { name: 'Priya Patel', email: 'priya@example.com', phone: '9876543211', password: 'priya123', joined: '2025-02-20', totalOrders: 5 },
+      { name: 'Amit Kumar', email: 'amit@example.com', phone: '9876543212', password: 'amit123', joined: '2025-03-10', totalOrders: 2 }
     ]);
     console.log('Default users seeded');
   }

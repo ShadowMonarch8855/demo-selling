@@ -1229,14 +1229,23 @@ const app = {
       return;
     }
     
-    // Save user locally
     const user = { name, email, phone, joined: new Date().toISOString().split('T')[0] };
+    
+    // Save to localStorage registered users (fallback in case API/DB is reset)
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const existing = registeredUsers.find(u => u.email === email);
+    if (existing) {
+      this.showToast('Email already registered', 'error');
+      return;
+    }
+    registeredUsers.push({ ...user, password });
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
     
     if (API_BASE) {
       try {
         await apiCall('/api/users', {
           method: 'POST',
-          body: JSON.stringify(user)
+          body: JSON.stringify({ ...user, password })
         });
       } catch (err) {
         console.warn('Failed to register on server:', err);
@@ -1261,26 +1270,33 @@ const app = {
       return;
     }
     
-    // For demo: accept any login or fetch from API
     let user = null;
+    let userSource = null;
     
-    if (API_BASE) {
+    // First check localStorage registered users
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const localUser = registeredUsers.find(u => u.email === email && u.password === password);
+    if (localUser) {
+      user = { name: localUser.name, email: localUser.email, phone: localUser.phone, joined: localUser.joined };
+      userSource = 'local';
+    }
+    
+    // If not found locally, try API
+    if (!user && API_BASE) {
       try {
         const users = await apiCall('/api/users');
         user = users.find(u => u.email === email);
+        if (user) {
+          userSource = 'api';
+        }
       } catch (err) {
         console.warn('Failed to fetch users from server:', err);
       }
     }
     
-    // If user not found in API, create a local user
     if (!user) {
-      user = {
-        name: email.split('@')[0],
-        email: email,
-        phone: '9876543210',
-        joined: new Date().toISOString().split('T')[0]
-      };
+      this.showToast('Invalid email or password', 'error');
+      return;
     }
     
     localStorage.setItem('currentUser', JSON.stringify(user));
