@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VastraKart Admin Portal</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <span class="logo-icon">👗</span> VastraKart Admin
+      </div>
+      <nav class="admin-nav">
+        <button class="admin-nav-item active" onclick="admin.navigate('dashboard')">
+          <span>📊</span> Dashboard
+        </button>
+        <button class="admin-nav-item" onclick="admin.navigate('products')">
+          <span>👕</span> Products
+        </button>
+        <button class="admin-nav-item" onclick="admin.navigate('orders')">
+          <span>📦</span> Orders
+        </button>
+        <button class="admin-nav-item" onclick="admin.navigate('payments')">
+          <span>💳</span> Payments
+        </button>
+        <button class="admin-nav-item" onclick="admin.navigate('users')">
+          <span>👥</span> Users
+        </button>
+        <button class="admin-nav-item" onclick="admin.navigate('settings')">
+          <span>⚙️</span> Settings
+        </button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <button class="logout-btn" onclick="admin.logout()">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Dashboard -->
+      <div id="admin-dashboard" class="admin-page active">
+        <h1 class="admin-title">Dashboard Overview</h1>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <h3 id="stat-users">0</h3>
+              <p>Total Users</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-info">
+              <h3 id="stat-orders">0</h3>
+              <p>Total Orders</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👕</div>
+            <div class="stat-info">
+              <h3 id="stat-products">0</h3>
+              <p>Total Products</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <h3 id="stat-revenue">₹0</h3>
+              <p>Total Revenue</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <h3 id="stat-pending">0</h3>
+              <p>Pending Orders</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <h3 id="stat-delivered">0</h3>
+              <p>Delivered Orders</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Revenue Overview</h3>
+            <canvas id="revenueChart" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Orders by Category</h3>
+            <canvas id="categoryChart" height="200"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="recent-section">
+          <h3>Recent Orders</h3>
+          <div class="table-wrapper">
+            <table class="admin-table" id="recent-orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Management -->
+      <div id="admin-products" class="admin-page">
+        <div class="admin-header">
+          <h1 class="admin-title">Product Management</h1>
+          <button class="admin-btn primary" onclick="admin.showAddProductModal()">+ Add Product</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="admin-table" id="products-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Sizes</th>
+                <th>Colors</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Orders Management -->
+      <div id="admin-orders" class="admin-page">
+        <h1 class="admin-title">Order Management</h1>
+        <div class="order-filters">
+          <button class="filter-chip active" onclick="admin.filterOrders('all')">All</button>
+          <button class="filter-chip" onclick="admin.filterOrders('pending')">Pending</button>
+          <button class="filter-chip" onclick="admin.filterOrders('approved')">Approved</button>
+          <button class="filter-chip" onclick="admin.filterOrders('shipped')">Shipped</button>
+          <button class="filter-chip" onclick="admin.filterOrders('delivered')">Delivered</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="admin-table" id="orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Payment Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Payments Management -->
+      <div id="admin-payments" class="admin-page">
+        <h1 class="admin-title">Payment Management</h1>
+        <div class="table-wrapper">
+          <table class="admin-table" id="payments-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users Management -->
+      <div id="admin-users" class="admin-page">
+        <h1 class="admin-title">User Management</h1>
+        <div class="table-wrapper">
+          <table class="admin-table" id="users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Total Orders</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div id="admin-settings" class="admin-page">
+        <h1 class="admin-title">Admin Settings</h1>
+        <div class="settings-card">
+          <h3>Store Settings</h3>
+          <div class="form-group">
+            <label>Store Name</label>
+            <input type="text" id="store-name" value="VastraKart">
+          </div>
+          <div class="form-group">
+            <label>Contact Email</label>
+            <input type="email" id="store-email" value="support@vastrakart.com">
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="store-currency">
+              <option value="₹">₹ (INR)</option>
+              <option value="$">$ (USD)</option>
+            </select>
+          </div>
+          <button class="save-btn" onclick="admin.saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div class="modal" id="product-modal-admin">
+    <div class="modal-content admin-modal-content">
+      <div class="modal-header">
+        <h2 id="product-modal-title">Add Product</h2>
+        <button class="modal-close" onclick="admin.closeProductModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="product-form" onsubmit="admin.saveProduct(event)">
+          <input type="hidden" id="prod-id">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="prod-name" required>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="prod-category">
+              <option value="Men">Men</option>
+              <option value="Women">Women</option>
+              <option value="Kids">Kids</option>
+              <option value="Ethnic">Ethnic Wear</option>
+              <option value="Formal">Formal</option>
+              <option value="Casual">Casual</option>
+              <option value="Winter">Winter Wear</option>
+              <option value="Sportswear">Sportswear</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="prod-price" required>
+          </div>
+          <div class="form-group">
+            <label>Sizes (comma separated)</label>
+            <input type="text" id="prod-sizes" placeholder="S, M, L, XL">
+          </div>
+          <div class="form-group">
+            <label>Colors (comma separated)</label>
+            <input type="text" id="prod-colors" placeholder="Red, Blue, Black">
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <input type="text" id="prod-brand">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="prod-description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Main Image</label>
+            <input type="file" id="prod-image-file" accept="image/*" onchange="admin.handleImageUpload(this, 'prod-image')">
+            <input type="text" id="prod-image" placeholder="Or paste image URL">
+          </div>
+          <div class="form-group">
+            <label>Additional Images (for different angles)</label>
+            <input type="file" id="prod-images-files" accept="image/*" multiple onchange="admin.handleMultipleImageUpload(this)">
+            <textarea id="prod-images" rows="2" placeholder="Or paste additional image URLs, comma separated"></textarea>
+            <div id="uploaded-images-preview" style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;"></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="save-btn">Save Product</button>
+            <button type="button" class="cancel-btn" onclick="admin.closeProductModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Action Modal -->
+  <div class="modal" id="order-action-modal">
+    <div class="modal-content admin-modal-content">
+      <div class="modal-header">
+        <h2>Update Order Status</h2>
+        <button class="modal-close" onclick="admin.closeOrderModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Order ID</label>
+          <input type="text" id="order-action-id" readonly>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="order-action-status">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tracking Number</label>
+          <input type="text" id="order-action-tracking" readonly>
+        </div>
+        <div class="form-group">
+          <label>Delivery Date</label>
+          <input type="date" id="order-action-delivery">
+        </div>
+        <div class="form-actions">
+          <button class="save-btn" onclick="admin.updateOrderStatus()">Update Status</button>
+          <button class="cancel-btn" onclick="admin.closeOrderModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Payment Modal -->
+  <div class="modal" id="razorpay-modal">
+    <div class="modal-content admin-modal-content">
+      <div class="modal-header">
+        <h2>Process Payment</h2>
+        <button class="modal-close" onclick="admin.closeRazorpayModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Order ID</label>
+          <input type="text" id="razorpay-order-id" readonly>
+        </div>
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="razorpay-amount" readonly>
+        </div>
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" id="razorpay-customer" readonly>
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select id="razorpay-method">
+            <option value="card">Credit/Debit Card</option>
+            <option value="upi">UPI</option>
+            <option value="wallet">Wallet</option>
+            <option value="netbanking">Net Banking</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="save-btn" onclick="admin.initiateRazorpayPayment()">Pay with Razorpay</button>
+          <button class="cancel-btn" onclick="admin.closeRazorpayModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script src="admin.js"></script>
+</body>
+</html>
