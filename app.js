@@ -707,10 +707,12 @@ const app = {
       return;
     }
     
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
+    
     const order = {
       items: [...this.cart],
       address: selectedAddress || this.addresses[0],
-      payment: document.querySelector('input[name="payment"]:checked')?.value || 'cod',
+      payment: paymentMethod,
       subtotal: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
       status: 'pending',
       date: new Date().toISOString(),
@@ -725,6 +727,12 @@ const app = {
           body: JSON.stringify(order)
         });
         order.id = created.id;
+        
+        // If Razorpay payment, initiate payment
+        if (paymentMethod === 'razorpay') {
+          await this.initiateRazorpayPayment(order);
+          return;
+        }
       } else {
         order.id = 'ORD' + Date.now().toString().slice(-8);
         this.orders.unshift(order);
@@ -738,6 +746,80 @@ const app = {
     } catch (err) {
       console.error('Place order error:', err);
       this.showToast('Failed to place order. Please try again.', 'error');
+    }
+  },
+
+  async initiateRazorpayPayment(order) {
+    try {
+      // Create Razorpay order
+      const razorpayOrder = await apiCall('/api/payment/create-order', {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: order.subtotal,
+          currency: 'INR',
+          receipt: order.id
+        })
+      });
+      
+      // Get Razorpay key
+      const { key } = await apiCall('/api/payment/key');
+      
+      const options = {
+        key: key,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'VastraKart',
+        description: `Payment for Order ${order.id}`,
+        order_id: razorpayOrder.id,
+        handler: async (response) => {
+          try {
+            // Verify payment on backend
+            await apiCall('/api/payment/verify', {
+              method: 'POST',
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderId: order.id
+              })
+            });
+            
+            // Update order status
+            await apiCall(`/api/orders/${order.id}`, {
+              method: 'PUT',
+              body: JSON.stringify({
+                paymentStatus: 'paid',
+                payment: 'razorpay',
+                status: 'approved'
+              })
+            });
+            
+            this.cart = [];
+            this.saveData();
+            this.updateBadges();
+            this.showToast('Payment successful! Order confirmed.', 'success');
+            this.navigate('orders');
+          } catch (err) {
+            console.error('Payment verification error:', err);
+            this.showToast('Payment verification failed. Please contact support.', 'error');
+          }
+        },
+        prefill: {
+          name: order.address?.name || 'Customer',
+          email: 'customer@vastrakart.com',
+          contact: order.address?.phone || '9876543210'
+        },
+        theme: {
+          color: '#2874f0'
+        }
+      };
+      
+      const rzp = new Razorpay(options);
+      rzp.open();
+      
+    } catch (err) {
+      console.error('Razorpay initiation error:', err);
+      this.showToast('Failed to initiate payment. Please try again.', 'error');
     }
   },
 
