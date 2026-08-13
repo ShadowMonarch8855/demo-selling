@@ -13,7 +13,8 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.static(path.join(__dirname, '..', 'admin')));
+app.use(express.static(path.join(__dirname, '..')));
+app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
 
 // Razorpay instance
 const razorpay = new Razorpay({
