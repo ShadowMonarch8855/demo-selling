@@ -142,6 +142,179 @@ input, select, textarea {
   }
 }
 
+@media (max-width: 480px) {
+  .header-top-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 10px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .logo-icon {
+    font-size: 1.4rem;
+  }
+
+  .search-bar {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .header-btn {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .header-btn .icon {
+    font-size: 1rem;
+  }
+
+  .nav-inner {
+    padding: 8px 10px;
+    gap: 12px;
+  }
+
+  .nav-category-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 0.8rem;
+  }
+
+  .hero-slider {
+    height: 220px;
+  }
+
+  .hero-slide {
+    padding: 24px 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .cta-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .product-card img {
+    height: 150px;
+  }
+
+  .product-info {
+    padding: 10px;
+  }
+
+  .product-title {
+    font-size: 0.85rem;
+  }
+
+  .product-price {
+    font-size: 0.95rem;
+  }
+
+  .add-cart-btn {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .filter-bar {
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .filter-group select {
+    min-width: 100px;
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  .login-card {
+    max-width: 100%;
+    margin: 0 10px;
+  }
+
+  .cart-layout,
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-summary,
+  .checkout-summary {
+    position: static;
+  }
+
+  .profile-page {
+    flex-direction: column;
+    padding: 16px 0;
+  }
+
+  .profile-sidebar {
+    width: 100%;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .product-modal-body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .product-main-image {
+    height: 250px;
+  }
+
+  .container {
+    padding: 0 10px;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .order-card {
+    padding: 14px;
+  }
+
+  .empty-state {
+    padding: 40px 10px;
+  }
+
+  .empty-state .empty-icon {
+    font-size: 3rem;
+  }
+}
+
 .badge {
   background: #fb641b;
   color: #fff;
