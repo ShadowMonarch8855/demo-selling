@@ -106,7 +106,7 @@ const admin = {
 
   logout() {
     this.showToast('Logged out from admin portal', 'success');
-    window.location.href = '../index.html';
+    window.location.href = '/index.html';
   },
 
   // --- DASHBOARD ---
