@@ -1,5 +1,5 @@
 // --- DATA STORE ---
-const API_BASE = (typeof window !== 'undefined' && window.APP_API_BASE) || '';
+const API_BASE = (typeof window !== 'undefined' && window.APP_API_BASE) || 'https://demo-selling.onrender.com';
 const defaultProducts = [
   {
     id: 1,
