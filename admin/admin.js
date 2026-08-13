@@ -164,7 +164,7 @@ const admin = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = canvas.parentElement.clientWidth - 40;
+    const width = Math.max(200, canvas.width = canvas.parentElement.clientWidth - 40);
     const height = canvas.height = 200;
     
     ctx.clearRect(0, 0, width, height);
@@ -196,7 +196,7 @@ const admin = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = canvas.parentElement.clientWidth - 40;
+    const width = Math.max(200, canvas.width = canvas.parentElement.clientWidth - 40);
     const height = canvas.height = 200;
     
     ctx.clearRect(0, 0, width, height);
@@ -204,7 +204,7 @@ const admin = {
     const total = data.reduce((a, b) => a + b, 0);
     const centerX = width / 3;
     const centerY = height / 2;
-    const radius = Math.min(centerX, centerY) - 20;
+    const radius = Math.max(1, Math.min(centerX, centerY) - 20);
     
     const colors = ['#2874f0', '#fb641b', '#388e3c', '#ff9800', '#9c27b0'];
     let startAngle = 0;
