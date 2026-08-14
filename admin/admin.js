@@ -1,5 +1,8 @@
 // --- ADMIN CONFIG ---
-const API_BASE = (typeof window !== 'undefined' && window.ADMIN_API_BASE) || 'https://demo-selling.onrender.com';
+const API_BASE = (typeof window !== 'undefined' && window.ADMIN_API_BASE) ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+    ? 'http://localhost:10000'
+    : 'https://demo-selling.onrender.com');
 
 // --- ADMIN DATA ---
 const admin = {
@@ -139,7 +142,7 @@ const admin = {
     const recentOrders = this.orders.slice(0, 5);
     
     if (recentOrders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">No orders yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">No orders yet</td></tr>';
       return;
     }
     
@@ -147,6 +150,7 @@ const admin = {
       <tr>
         <td>${order.id}</td>
         <td>${order.address?.name || 'Guest'}</td>
+        <td>${order.userId || 'N/A'}</td>
         <td>₹${order.subtotal}</td>
         <td><span class="order-status ${order.status}">${order.status}</span></td>
         <td>${new Date(order.date).toLocaleDateString()}</td>
@@ -418,7 +422,7 @@ const admin = {
     }
     
     if (orders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center">No orders found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center">No orders found</td></tr>';
       return;
     }
     
@@ -426,6 +430,7 @@ const admin = {
       <tr>
         <td>${order.id}</td>
         <td>${order.address?.name || 'Guest'}</td>
+        <td>${order.userId || 'N/A'}</td>
         <td>${order.items.length} items</td>
         <td>₹${order.subtotal}</td>
         <td>${(order.payment || 'cod').toUpperCase()}</td>
@@ -508,7 +513,6 @@ const admin = {
     const method = document.getElementById('razorpay-method').value;
     
     try {
-      // Create Razorpay order
       const razorpayOrder = await this.api('/api/payment/create-order', {
         method: 'POST',
         body: JSON.stringify({ 
@@ -526,7 +530,6 @@ const admin = {
         description: `Payment for Order ${orderId}`,
         order_id: razorpayOrder.id,
         handler: async (response) => {
-          // Verify payment on backend
           await this.api('/api/payment/verify', {
             method: 'POST',
             body: JSON.stringify({
@@ -537,7 +540,6 @@ const admin = {
             })
           });
           
-          // Update order
           await this.api(`/api/orders/${orderId}`, {
             method: 'PUT',
             body: JSON.stringify({ 
@@ -610,7 +612,6 @@ const admin = {
         body: JSON.stringify({ status: 'approved' })
       });
       
-      // Also update order status
       const payment = this.payments.find(p => p.id == paymentId);
       if (payment) {
         const order = this.orders.find(o => o.id == payment.orderId);
@@ -642,7 +643,7 @@ const admin = {
     }
     
     tbody.innerHTML = this.users.map(user => {
-      const userOrders = this.orders.filter(o => o.address?.name === user.name).length;
+      const userOrders = this.orders.filter(o => o.userId === user.email).length;
       return `
         <tr>
           <td><strong>${user.name}</strong></td>
@@ -665,7 +666,7 @@ const admin = {
     const user = this.users.find(u => u.id == userId);
     if (!user) return;
     
-    const userOrders = this.orders.filter(o => o.address?.name === user.name);
+    const userOrders = this.orders.filter(o => o.userId === user.email);
     alert(`User: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone}\nJoined: ${new Date(user.joined).toLocaleDateString()}\nTotal Orders: ${userOrders.length}`);
   },
 

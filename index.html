@@ -1,156 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VastraKart - Fashion E-Commerce</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VastraKart - Fashion E-Commerce</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-top">
-      <div class="container header-top-inner">
-        <a href="#" class="logo" onclick="app.navigate('home')">
-          <span class="logo-icon">👗</span> VastraKart
-        </a>
-        <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search for clothes, fashion and more...">
-          <button onclick="app.search()">Search</button>
-        </div>
-        <div class="header-actions">
-          <button class="header-btn" onclick="app.navigate('home')">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container header-top-inner">
+                <a href="#" class="logo" onclick="app.navigate('home')">
+                    <span class="logo-icon">👗</span> VastraKart
+                </a>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search for clothes, fashion and more...">
+                    <button onclick="app.search()">Search</button>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="app.navigate('home')">
             <span class="icon">🏠</span>
             <span class="label">Home</span>
           </button>
-          <button class="header-btn" id="header-profile-btn" onclick="app.handleProfileClick()">
-            <span class="icon">👤</span>
-            <span class="label">Profile</span>
-          </button>
-          <button class="header-btn" onclick="app.navigate('wishlist')">
+
+                    <button class="header-btn" onclick="app.navigate('wishlist')">
             <span class="icon">❤️</span>
             <span class="label">Wishlist</span>
             <span class="badge" id="wishlist-count">0</span>
           </button>
-          <button class="header-btn cart-btn-main" onclick="app.navigate('cart')">
+                    <button class="header-btn cart-btn-main" onclick="app.navigate('cart')">
             <span class="icon">🛒</span>
             <span class="label">Cart</span>
             <span class="badge" id="cart-count">0</span>
           </button>
-          <button class="header-btn" onclick="app.navigate('orders')">
+                    <button class="header-btn" onclick="app.navigate('orders')">
             <span class="icon">📦</span>
             <span class="label">Orders</span>
           </button>
+                    <button class="header-btn" id="header-profile-btn" onclick="app.handleProfileClick()">
+            <span class="icon">👤</span>
+            <span class="label">Profile</span>
+          </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <nav class="header-nav">
-      <div class="container nav-inner">
-        <button class="nav-category-btn">All Categories ▾</button>
-        <div class="nav-links">
-          <a href="#" onclick="app.filterCategory('Men'); return false;">Men</a>
-          <a href="#" onclick="app.filterCategory('Women'); return false;">Women</a>
-          <a href="#" onclick="app.filterCategory('Kids'); return false;">Kids</a>
-          <a href="#" onclick="app.filterCategory('Ethnic'); return false;">Ethnic Wear</a>
-          <a href="#" onclick="app.filterCategory('Formal'); return false;">Formal</a>
-          <a href="#" onclick="app.filterCategory('Casual'); return false;">Casual</a>
-          <a href="#" onclick="app.filterCategory('Winter'); return false;">Winter Wear</a>
-          <a href="#" onclick="app.filterCategory('Sportswear'); return false;">Sportswear</a>
+        <nav class="header-nav">
+            <div class="container nav-inner">
+                <button class="nav-category-btn">All Categories ▾</button>
+                <div class="nav-links">
+                    <a href="#" onclick="app.filterCategory('Men'); return false;">Men</a>
+                    <a href="#" onclick="app.filterCategory('Women'); return false;">Women</a>
+                    <a href="#" onclick="app.filterCategory('Kids'); return false;">Kids</a>
+                    <a href="#" onclick="app.filterCategory('Ethnic'); return false;">Ethnic Wear</a>
+                    <a href="#" onclick="app.filterCategory('Formal'); return false;">Formal</a>
+                    <a href="#" onclick="app.filterCategory('Casual'); return false;">Casual</a>
+                    <a href="#" onclick="app.filterCategory('Winter'); return false;">Winter Wear</a>
+                    <a href="#" onclick="app.filterCategory('Sportswear'); return false;">Sportswear</a>
+                </div>
+            </div>
+        </nav>
+        <!-- Mobile category toggle button (visible on small screens) -->
+        <button class="mobile-category-toggle" onclick="app.toggleMobileCategories()">
+      Categories ▾
+    </button>
+        <!-- Mobile categories panel -->
+        <div class="mobile-categories-panel" id="mobile-categories-panel">
+            <button class="cat-chip active" onclick="app.filterCategory('all')">All</button>
+            <button class="cat-chip" onclick="app.filterCategory('Men')">Men</button>
+            <button class="cat-chip" onclick="app.filterCategory('Women')">Women</button>
+            <button class="cat-chip" onclick="app.filterCategory('Kids')">Kids</button>
+            <button class="cat-chip" onclick="app.filterCategory('Ethnic')">Ethnic Wear</button>
+            <button class="cat-chip" onclick="app.filterCategory('Formal')">Formal</button>
+            <button class="cat-chip" onclick="app.filterCategory('Casual')">Casual</button>
+            <button class="cat-chip" onclick="app.filterCategory('Winter')">Winter Wear</button>
+            <button class="cat-chip" onclick="app.filterCategory('Sportswear')">Sportswear</button>
         </div>
-      </div>
+    </header>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-item" onclick="app.navigate('home')">
+      <span class="mobile-nav-icon">🏠</span>
+      <span class="mobile-nav-label">Home</span>
+    </button>
+        <button class="mobile-nav-item" onclick="app.toggleMobileCategories()">
+      <span class="mobile-nav-icon">📂</span>
+      <span class="mobile-nav-label">Categories</span>
+    </button>
+        <button class="mobile-nav-item" onclick="app.navigate('wishlist')">
+      <span class="mobile-nav-icon">❤️</span>
+      <span class="mobile-nav-label">Wishlist</span>
+    </button>
+        <button class="mobile-nav-item" onclick="app.navigate('cart')">
+      <span class="mobile-nav-icon">🛒</span>
+      <span class="mobile-nav-label">Cart</span>
+      <span class="badge" id="cart-count-bottom">0</span>
+    </button>
+        <button class="mobile-nav-item" onclick="app.navigate('orders')">
+      <span class="mobile-nav-icon">📦</span>
+      <span class="mobile-nav-label">Orders</span>
+    </button>
+        <button class="mobile-nav-item" onclick="app.handleProfileClick()">
+      <span class="mobile-nav-icon">👤</span>
+      <span class="mobile-nav-label">Profile</span>
+    </button>
     </nav>
-  </header>
 
-  <!-- Main Content Area -->
-  <main id="main-content">
-    <!-- Login Page -->
-    <div id="page-login" class="page active">
-      <div class="container login-page">
-        <div class="login-card">
-          <div class="login-tabs">
-            <button class="login-tab active" onclick="app.setLoginTab(this, 'login')">Login</button>
-            <button class="login-tab" onclick="app.setLoginTab(this, 'register')">Register</button>
-          </div>
-          <div id="login-tab-login" class="login-tab-content active">
-            <form onsubmit="app.login(event)">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="login-email" required>
-              </div>
-              <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="login-password" required>
-              </div>
-              <button type="submit" class="save-btn" style="width:100%">Login</button>
-            </form>
-          </div>
-          <div id="login-tab-register" class="login-tab-content">
-            <form onsubmit="app.register(event)">
-              <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="reg-name" required>
-              </div>
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="reg-email" required>
-              </div>
-              <div class="form-group">
-                <label>Phone</label>
-                <input type="tel" id="reg-phone" required>
-              </div>
-              <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="reg-password" required>
-              </div>
-              <button type="submit" class="save-btn" style="width:100%">Register</button>
-            </form>
-          </div>
+    <!-- Main Content Area -->
+    <main id="main-content">
+        <!-- Login Page -->
+        <div id="page-login" class="page active">
+            <div class="container login-page">
+                <div class="login-card">
+                    <div class="login-tabs">
+                        <button class="login-tab active" onclick="app.setLoginTab(this, 'login')">Login</button>
+                        <button class="login-tab" onclick="app.setLoginTab(this, 'register')">Register</button>
+                    </div>
+                    <div id="login-tab-login" class="login-tab-content active">
+                        <form onsubmit="app.login(event)">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="login-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="login-password" required>
+                            </div>
+                            <button type="submit" class="save-btn" style="width:100%">Login</button>
+                        </form>
+                    </div>
+                    <div id="login-tab-register" class="login-tab-content">
+                        <form onsubmit="app.register(event)">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="reg-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="reg-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="reg-phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="reg-password" required>
+                            </div>
+                            <button type="submit" class="save-btn" style="width:100%">Register</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Home Page -->
-    <div id="page-home" class="page">
-      <!-- Hero Banner -->
-      <section class="hero-banner">
-        <div class="hero-slider">
-          <div class="hero-slide active">
-            <div class="hero-content">
-              <h1>Summer Sale 2025</h1>
-              <p>Up to 70% Off on Top Brands</p>
-              <button class="cta-btn" onclick="app.filterCategory('Casual')">Shop Now</button>
-            </div>
-          </div>
-          <div class="hero-slide">
-            <div class="hero-content">
-              <h1>New Arrivals</h1>
-              <p>Discover Latest Trends</p>
-              <button class="cta-btn" onclick="app.filterCategory('Women')">Explore</button>
-            </div>
-          </div>
-          <div class="hero-slide">
-            <div class="hero-content">
-              <h1>Ethnic Elegance</h1>
-              <p>Traditional Meets Modern</p>
-              <button class="cta-btn" onclick="app.filterCategory('Ethnic')">View Collection</button>
-            </div>
-          </div>
-        </div>
-        <div class="hero-dots">
-          <span class="dot active" onclick="app.setSlide(0)"></span>
-          <span class="dot" onclick="app.setSlide(1)"></span>
-          <span class="dot" onclick="app.setSlide(2)"></span>
-        </div>
-      </section>
+        <!-- Home Page -->
+        <div id="page-home" class="page">
+            <!-- Hero Banner -->
+            <section class="hero-banner">
+                <div class="hero-slider">
+                    <div class="hero-slide active">
+                        <div class="hero-content">
+                            <h1>Summer Sale 2025</h1>
+                            <p>Up to 70% Off on Top Brands</p>
+                            <button class="cta-btn" onclick="app.filterCategory('Casual')">Shop Now</button>
+                        </div>
+                    </div>
+                    <div class="hero-slide">
+                        <div class="hero-content">
+                            <h1>New Arrivals</h1>
+                            <p>Discover Latest Trends</p>
+                            <button class="cta-btn" onclick="app.filterCategory('Women')">Explore</button>
+                        </div>
+                    </div>
+                    <div class="hero-slide">
+                        <div class="hero-content">
+                            <h1>Ethnic Elegance</h1>
+                            <p>Traditional Meets Modern</p>
+                            <button class="cta-btn" onclick="app.filterCategory('Ethnic')">View Collection</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-dots">
+                    <span class="dot active" onclick="app.setSlide(0)"></span>
+                    <span class="dot" onclick="app.setSlide(1)"></span>
+                    <span class="dot" onclick="app.setSlide(2)"></span>
+                </div>
+            </section>
 
-      <!-- Filters -->
-      <section class="filters-section">
-        <div class="container">
-          <div class="filter-bar">
-            <div class="filter-group">
-              <label>Category:</label>
-              <select id="filter-category" onchange="app.applyFilters()">
+            <!-- Filters -->
+            <section class="filters-section">
+                <div class="container">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Category:</label>
+                            <select id="filter-category" onchange="app.applyFilters()">
                 <option value="all">All</option>
                 <option value="Men">Men</option>
                 <option value="Women">Women</option>
@@ -161,10 +209,10 @@
                 <option value="Winter">Winter Wear</option>
                 <option value="Sportswear">Sportswear</option>
               </select>
-            </div>
-            <div class="filter-group">
-              <label>Size:</label>
-              <select id="filter-size" onchange="app.applyFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <label>Size:</label>
+                            <select id="filter-size" onchange="app.applyFilters()">
                 <option value="all">All</option>
                 <option value="S">S</option>
                 <option value="M">M</option>
@@ -172,10 +220,10 @@
                 <option value="XL">XL</option>
                 <option value="XXL">XXL</option>
               </select>
-            </div>
-            <div class="filter-group">
-              <label>Color:</label>
-              <select id="filter-color" onchange="app.applyFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <label>Color:</label>
+                            <select id="filter-color" onchange="app.applyFilters()">
                 <option value="all">All</option>
                 <option value="Red">Red</option>
                 <option value="Blue">Blue</option>
@@ -184,257 +232,257 @@
                 <option value="Green">Green</option>
                 <option value="Yellow">Yellow</option>
               </select>
-            </div>
-            <div class="filter-group">
-              <label>Price:</label>
-              <select id="filter-price" onchange="app.applyFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <label>Price:</label>
+                            <select id="filter-price" onchange="app.applyFilters()">
                 <option value="all">All</option>
                 <option value="0-500">Under ₹500</option>
                 <option value="500-1000">₹500 - ₹1000</option>
                 <option value="1000-2000">₹1000 - ₹2000</option>
                 <option value="2000+">Above ₹2000</option>
               </select>
-            </div>
-            <div class="filter-group">
-              <label>Sort:</label>
-              <select id="filter-sort" onchange="app.applyFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort:</label>
+                            <select id="filter-sort" onchange="app.applyFilters()">
                 <option value="popularity">Popularity</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Avg. Customer Rating</option>
                 <option value="newest">Newest First</option>
               </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Grid -->
+            <section class="products-section">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Latest Fashion</h2>
+                        <div class="view-toggle">
+                            <button class="view-btn active" onclick="app.setView('grid')">⊞</button>
+                            <button class="view-btn" onclick="app.setView('list')">☰</button>
+                        </div>
+                    </div>
+                    <div class="product-grid" id="product-grid"></div>
+                    <div class="load-more" id="load-more" style="display:none;">
+                        <button onclick="app.loadMore()">Load More</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Product Detail Page -->
+        <div id="page-product" class="page">
+            <div class="container product-detail-container" id="product-detail-content">
+                <!-- Injected dynamically -->
             </div>
-          </div>
         </div>
-      </section>
 
-      <!-- Products Grid -->
-      <section class="products-section">
-        <div class="container">
-          <div class="section-header">
-            <h2>Latest Fashion</h2>
-            <div class="view-toggle">
-              <button class="view-btn active" onclick="app.setView('grid')">⊞</button>
-              <button class="view-btn" onclick="app.setView('list')">☰</button>
+        <!-- Cart Page -->
+        <div id="page-cart" class="page">
+            <div class="container cart-page">
+                <h1>Shopping Cart</h1>
+                <div class="cart-layout">
+                    <div class="cart-items-list" id="cart-items-list"></div>
+                    <div class="cart-summary" id="cart-summary"></div>
+                </div>
             </div>
-          </div>
-          <div class="product-grid" id="product-grid"></div>
-          <div class="load-more" id="load-more" style="display:none;">
-            <button onclick="app.loadMore()">Load More</button>
-          </div>
         </div>
-      </section>
-    </div>
 
-    <!-- Product Detail Page -->
-    <div id="page-product" class="page">
-      <div class="container product-detail-container" id="product-detail-content">
-        <!-- Injected dynamically -->
-      </div>
-    </div>
-
-    <!-- Cart Page -->
-    <div id="page-cart" class="page">
-      <div class="container cart-page">
-        <h1>Shopping Cart</h1>
-        <div class="cart-layout">
-          <div class="cart-items-list" id="cart-items-list"></div>
-          <div class="cart-summary" id="cart-summary"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Wishlist Page -->
-    <div id="page-wishlist" class="page">
-      <div class="container wishlist-page">
-        <h1>My Wishlist</h1>
-        <div class="wishlist-grid" id="wishlist-grid"></div>
-      </div>
-    </div>
-
-    <!-- Orders Page -->
-    <div id="page-orders" class="page">
-      <div class="container orders-page">
-        <h1>My Orders</h1>
-        <div class="orders-tabs">
-          <button class="order-tab active" onclick="app.setOrderTab('all')">All Orders</button>
-          <button class="order-tab" onclick="app.setOrderTab('pending')">Pending</button>
-          <button class="order-tab" onclick="app.setOrderTab('shipped')">Shipped</button>
-          <button class="order-tab" onclick="app.setOrderTab('delivered')">Delivered</button>
-        </div>
-        <div class="orders-list" id="orders-list"></div>
-      </div>
-    </div>
-
-    <!-- Checkout Page -->
-    <div id="page-checkout" class="page">
-      <div class="container checkout-page">
-        <h1>Checkout</h1>
-        <div class="checkout-layout">
-          <div class="checkout-forms">
-            <div class="checkout-section">
-              <h3>Delivery Address</h3>
-              <div id="address-book"></div>
-              <button class="add-btn" onclick="app.showAddressForm()">+ Add New Address</button>
-              <div id="new-address-form" style="display:none;">
-                <input type="text" id="addr-name" placeholder="Full Name">
-                <input type="text" id="addr-phone" placeholder="Phone Number">
-                <input type="text" id="addr-pincode" placeholder="Pincode">
-                <input type="text" id="addr-state" placeholder="State">
-                <input type="text" id="addr-city" placeholder="City">
-                <textarea id="addr-details" placeholder="Full Address"></textarea>
-                <button class="save-btn" onclick="app.saveAddress()">Save Address</button>
-              </div>
+        <!-- Wishlist Page -->
+        <div id="page-wishlist" class="page">
+            <div class="container wishlist-page">
+                <h1>My Wishlist</h1>
+                <div class="wishlist-grid" id="wishlist-grid"></div>
             </div>
-            <div class="checkout-section">
-              <h3>Payment Method</h3>
-              <div class="payment-options">
-                <label class="payment-option">
+        </div>
+
+        <!-- Orders Page -->
+        <div id="page-orders" class="page">
+            <div class="container orders-page">
+                <h1>My Orders</h1>
+                <div class="orders-tabs">
+                    <button class="order-tab active" onclick="app.setOrderTab('all')">All Orders</button>
+                    <button class="order-tab" onclick="app.setOrderTab('pending')">Pending</button>
+                    <button class="order-tab" onclick="app.setOrderTab('shipped')">Shipped</button>
+                    <button class="order-tab" onclick="app.setOrderTab('delivered')">Delivered</button>
+                </div>
+                <div class="orders-list" id="orders-list"></div>
+            </div>
+        </div>
+
+        <!-- Checkout Page -->
+        <div id="page-checkout" class="page">
+            <div class="container checkout-page">
+                <h1>Checkout</h1>
+                <div class="checkout-layout">
+                    <div class="checkout-forms">
+                        <div class="checkout-section">
+                            <h3>Delivery Address</h3>
+                            <div id="address-book"></div>
+                            <button class="add-btn" onclick="app.showAddressForm()">+ Add New Address</button>
+                            <div id="new-address-form" style="display:none;">
+                                <input type="text" id="addr-name" placeholder="Full Name">
+                                <input type="text" id="addr-phone" placeholder="Phone Number">
+                                <input type="text" id="addr-pincode" placeholder="Pincode">
+                                <input type="text" id="addr-state" placeholder="State">
+                                <input type="text" id="addr-city" placeholder="City">
+                                <textarea id="addr-details" placeholder="Full Address"></textarea>
+                                <button class="save-btn" onclick="app.saveAddress()">Save Address</button>
+                            </div>
+                        </div>
+                        <div class="checkout-section">
+                            <h3>Payment Method</h3>
+                            <div class="payment-options">
+                                <label class="payment-option">
                   <input type="radio" name="payment" value="cod" checked>
                   <span>Cash on Delivery</span>
                 </label>
-                <label class="payment-option">
+                                <label class="payment-option">
                   <input type="radio" name="payment" value="razorpay">
                   <span>Pay Online (Razorpay)</span>
                 </label>
-                <label class="payment-option">
+                                <label class="payment-option">
                   <input type="radio" name="payment" value="card">
                   <span>Credit / Debit Card</span>
                 </label>
-                <label class="payment-option">
+                                <label class="payment-option">
                   <input type="radio" name="payment" value="upi">
                   <span>UPI</span>
                 </label>
-                <label class="payment-option">
+                                <label class="payment-option">
                   <input type="radio" name="payment" value="wallet">
                   <span>Wallet</span>
                 </label>
-              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkout-summary" id="checkout-summary"></div>
+                </div>
             </div>
-          </div>
-          <div class="checkout-summary" id="checkout-summary"></div>
         </div>
-      </div>
-    </div>
 
-    <!-- Profile Page -->
-    <div id="page-profile" class="page">
-      <div class="container profile-page">
-        <div class="profile-sidebar">
-          <div class="profile-avatar">
-            <div class="avatar-icon">👤</div>
-            <h3 id="profile-name">Guest User</h3>
-            <p id="profile-email">guest@example.com</p>
-          </div>
-          <div class="profile-menu">
-            <button class="profile-menu-item active" onclick="app.setProfileTab('info')">Account Info</button>
-            <button class="profile-menu-item" onclick="app.setProfileTab('addresses')">My Addresses</button>
-            <button class="profile-menu-item" onclick="app.setProfileTab('settings')">Settings</button>
-            <button class="profile-menu-item" onclick="app.logout()">Logout</button>
-          </div>
-        </div>
-        <div class="profile-content">
-          <div id="profile-tab-info" class="profile-tab active">
-            <h2>Account Information</h2>
-            <div class="profile-form">
-              <input type="text" id="profile-fullname" placeholder="Full Name">
-              <input type="email" id="profile-email-input" placeholder="Email">
-              <input type="tel" id="profile-phone" placeholder="Phone">
-              <button class="save-btn" onclick="app.updateProfile()">Save Changes</button>
-            </div>
-          </div>
-          <div id="profile-tab-addresses" class="profile-tab">
-            <h2>Saved Addresses</h2>
-            <div id="profile-addresses-list"></div>
-          </div>
-          <div id="profile-tab-settings" class="profile-tab">
-            <h2>Settings</h2>
-            <div class="settings-group">
-              <label>
+        <!-- Profile Page -->
+        <div id="page-profile" class="page">
+            <div class="container profile-page">
+                <div class="profile-sidebar">
+                    <div class="profile-avatar">
+                        <div class="avatar-icon">👤</div>
+                        <h3 id="profile-name">Guest User</h3>
+                        <p id="profile-email">guest@example.com</p>
+                    </div>
+                    <div class="profile-menu">
+                        <button class="profile-menu-item active" onclick="app.setProfileTab('info')">Account Info</button>
+                        <button class="profile-menu-item" onclick="app.setProfileTab('addresses')">My Addresses</button>
+                        <button class="profile-menu-item" onclick="app.setProfileTab('settings')">Settings</button>
+                    </div>
+                </div>
+                <div class="profile-content">
+                    <div id="profile-tab-info" class="profile-tab active">
+                        <h2>Account Information</h2>
+                        <div class="profile-form">
+                            <input type="text" id="profile-fullname" placeholder="Full Name">
+                            <input type="email" id="profile-email-input" placeholder="Email">
+                            <input type="tel" id="profile-phone" placeholder="Phone">
+                            <button class="save-btn" onclick="app.updateProfile()">Save Changes</button>
+                        </div>
+                    </div>
+                    <div id="profile-tab-addresses" class="profile-tab">
+                        <h2>Saved Addresses</h2>
+                        <div id="profile-addresses-list"></div>
+                    </div>
+                    <div id="profile-tab-settings" class="profile-tab">
+                        <h2>Settings</h2>
+                        <div class="settings-group">
+                            <label>
                 <input type="checkbox" id="setting-notifications" checked> Enable Email Notifications
               </label>
-              <label>
+                            <label>
                 <input type="checkbox" id="setting-sms" checked> Enable SMS Alerts
               </label>
-              <label>
+                            <label>
                 <input type="checkbox" id="setting-dark"> Dark Mode
               </label>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+
+        <!-- Order Tracking Page -->
+        <div id="page-tracking" class="page">
+            <div class="container tracking-page">
+                <h1>Track Order</h1>
+                <div class="tracking-card" id="tracking-card">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>ABOUT Vastrakart</h4>
+                    <p>India's fashion destination for the latest trends at best prices. Shop from a wide range of clothing for men, women, and kids.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>HELP</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">E-waste Recycling</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>SHOP BY</h4>
+                    <ul>
+                        <li><a href="#" onclick="app.filterCategory('Men'); return false;">Men</a></li>
+                        <li><a href="#" onclick="app.filterCategory('Women'); return false;">Women</a></li>
+                        <li><a href="#" onclick="app.filterCategory('Kids'); return false;">Kids</a></li>
+                        <li><a href="#" onclick="app.filterCategory('Ethnic'); return false;">Ethnic Wear</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CONSUMER POLICY</h4>
+                    <ul>
+                        <li><a href="#">Return Policy</a></li>
+                        <li><a href="#">Cancellation Policy</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Grievance Redressal</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 VastraKart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content product-modal-content">
+            <button class="modal-close" onclick="app.closeModal()">×</button>
+            <div class="product-modal-body" id="product-modal-body">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
     </div>
 
-    <!-- Order Tracking Page -->
-    <div id="page-tracking" class="page">
-      <div class="container tracking-page">
-        <h1>Track Order</h1>
-        <div class="tracking-card" id="tracking-card">
-          <!-- Injected dynamically -->
-        </div>
-      </div>
-    </div>
-  </main>
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <h4>ABOUT Vastrakart</h4>
-          <p>India's fashion destination for the latest trends at best prices. Shop from a wide range of clothing for men, women, and kids.</p>
-        </div>
-        <div class="footer-col">
-          <h4>HELP</h4>
-          <ul>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">E-waste Recycling</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>SHOP BY</h4>
-          <ul>
-            <li><a href="#" onclick="app.filterCategory('Men'); return false;">Men</a></li>
-            <li><a href="#" onclick="app.filterCategory('Women'); return false;">Women</a></li>
-            <li><a href="#" onclick="app.filterCategory('Kids'); return false;">Kids</a></li>
-            <li><a href="#" onclick="app.filterCategory('Ethnic'); return false;">Ethnic Wear</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>CONSUMER POLICY</h4>
-          <ul>
-            <li><a href="#">Return Policy</a></li>
-            <li><a href="#">Cancellation Policy</a></li>
-            <li><a href="#">Shipping Policy</a></li>
-            <li><a href="#">Grievance Redressal</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2025 VastraKart. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Product Detail Modal -->
-  <div class="modal" id="product-modal">
-    <div class="modal-content product-modal-content">
-      <button class="modal-close" onclick="app.closeModal()">×</button>
-      <div class="product-modal-body" id="product-modal-body">
-        <!-- Injected dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div class="toast-container" id="toast-container"></div>
-
-  <!-- Razorpay Script -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
+
 </html>

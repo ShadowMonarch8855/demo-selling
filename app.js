@@ -1,5 +1,8 @@
 // --- DATA STORE ---
-const API_BASE = (typeof window !== 'undefined' && window.APP_API_BASE) || 'https://demo-selling.onrender.com';
+const API_BASE = (typeof window !== 'undefined' && window.APP_API_BASE) ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+    ? 'http://localhost:10000'
+    : 'https://demo-selling.onrender.com');
 const defaultProducts = [{
         id: 1,
         name: "Men's Casual Cotton T-Shirt",
@@ -232,6 +235,22 @@ function initData() {
     }
 }
 
+// User-specific storage helpers
+function getUserStorageKey(baseKey, user) {
+    if (!user || !user.email) return baseKey;
+    return `${baseKey}_${user.email}`;
+}
+
+function loadUserData(baseKey, user) {
+    const key = getUserStorageKey(baseKey, user);
+    return JSON.parse(localStorage.getItem(key)) || [];
+}
+
+function saveUserData(baseKey, data, user) {
+    const key = getUserStorageKey(baseKey, user);
+    localStorage.setItem(key, JSON.stringify(data));
+}
+
 // API helper
 async function apiCall(url, options = {}) {
     try {
@@ -272,17 +291,16 @@ const app = {
 
         async init() {
             initData();
-            this.loadData();
             await this.loadProducts();
 
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 this.user = JSON.parse(savedUser);
+                this.loadData();
             }
 
             this.updateAuthUI();
 
-            // If not logged in, show login page
             if (!this.user) {
                 this.navigate('login');
             } else {
@@ -312,35 +330,43 @@ const app = {
             }
         },
 
-        loadData() {
-            this.cart = JSON.parse(localStorage.getItem('cart')) || [];
-            this.wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-            this.addresses = JSON.parse(localStorage.getItem('addresses')) || [];
-            this.user = JSON.parse(localStorage.getItem('currentUser')) || null;
+  loadData() {
+    this.cart = loadUserData('cart', this.user);
+    this.wishlist = loadUserData('wishlist', this.user);
+    this.addresses = loadUserData('addresses', this.user);
 
-            if (API_BASE) {
-                apiCall('/api/orders').then(orders => {
-                    this.orders = orders;
-                    if (this.currentPage === 'orders') {
-                        this.renderOrders();
-                    }
-                }).catch(() => {
-                    this.orders = JSON.parse(localStorage.getItem('orders')) || [];
-                });
-            } else {
-                this.orders = JSON.parse(localStorage.getItem('orders')) || [];
-            }
-        },
+    if (API_BASE) {
+      const userParam = this.user?.email ? `?userId=${encodeURIComponent(this.user.email)}` : '';
+      apiCall(`/api/orders${userParam}`).then(orders => {
+        this.orders = orders;
+        if (this.currentPage === 'orders') {
+          this.renderOrders();
+        }
+      }).catch(() => {
+        this.orders = loadUserData('orders', this.user);
+      });
+    } else {
+      this.orders = loadUserData('orders', this.user);
+    }
+  },
 
-        saveData() {
-            localStorage.setItem('cart', JSON.stringify(this.cart));
-            localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
-            localStorage.setItem('orders', JSON.stringify(this.orders));
-            localStorage.setItem('addresses', JSON.stringify(this.addresses));
-        },
+  saveData() {
+    saveUserData('cart', this.cart, this.user);
+    saveUserData('wishlist', this.wishlist, this.user);
+    saveUserData('addresses', this.addresses, this.user);
+  },
+
+  saveOrders() {
+    saveUserData('orders', this.orders, this.user);
+  },
 
         navigate(page) {
             this.currentPage = page;
+
+            const panel = document.getElementById('mobile-categories-panel');
+            if (panel) panel.style.display = 'none';
+            const toggleBtn = document.querySelector('.mobile-category-toggle');
+            if (toggleBtn) toggleBtn.classList.remove('open');
 
             const protectedPages = ['cart', 'wishlist', 'orders', 'checkout', 'profile', 'tracking'];
             if (protectedPages.includes(page) && !this.user) {
@@ -483,6 +509,10 @@ const app = {
       `;
                 grid.appendChild(card);
             });
+        },
+
+        loadMore() {
+          this.renderProducts();
         },
 
         showProductModal(productId) {
@@ -693,7 +723,7 @@ const app = {
       this.wishlist.push(productId);
       this.showToast('Added to wishlist!', 'success');
     }
-    localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
+    saveUserData('wishlist', this.wishlist, this.user);
     this.updateBadges();
     
     if (this.currentPage === 'wishlist') {
@@ -744,20 +774,21 @@ const app = {
       this.showToast('Your cart is empty!', 'error');
       return;
     }
-    
+
     const selectedAddress = this.addresses.find(a => a.selected);
     if (!selectedAddress && this.addresses.length > 0) {
       this.addresses[0].selected = true;
     }
-    
+
     if (this.addresses.length === 0) {
       this.showToast('Please add a delivery address', 'error');
       this.navigate('checkout');
       return;
     }
-    
+
     const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
-    
+    const tempOrderId = 'ORD' + Date.now().toString().slice(-8);
+
     const order = {
       items: [...this.cart],
       address: selectedAddress || this.addresses[0],
@@ -766,29 +797,32 @@ const app = {
       status: 'pending',
       date: new Date().toISOString(),
       trackingNumber: '',
-      deliveryDate: ''
+      deliveryDate: '',
+      id: tempOrderId,
+      userId: this.user?.email
     };
-    
+
     try {
       if (API_BASE) {
+        if (paymentMethod === 'razorpay') {
+          await this.initiateRazorpayPayment(order);
+          return;
+        }
+
         const created = await apiCall('/api/orders', {
           method: 'POST',
           body: JSON.stringify(order)
         });
         order.id = created.id;
-        
-        // If Razorpay payment, initiate payment
-        if (paymentMethod === 'razorpay') {
-          await this.initiateRazorpayPayment(order);
-          return;
-        }
+        this.orders.unshift(order);
       } else {
         order.id = 'ORD' + Date.now().toString().slice(-8);
         this.orders.unshift(order);
       }
-      
+
       this.cart = [];
       this.saveData();
+      this.saveOrders();
       this.updateBadges();
       this.showToast('Order placed successfully!', 'success');
       this.navigate('orders');
@@ -800,7 +834,6 @@ const app = {
 
   async initiateRazorpayPayment(order) {
     try {
-      // Create Razorpay order
       const razorpayOrder = await apiCall('/api/payment/create-order', {
         method: 'POST',
         body: JSON.stringify({
@@ -809,10 +842,9 @@ const app = {
           receipt: order.id
         })
       });
-      
-      // Get Razorpay key
+
       const { key } = await apiCall('/api/payment/key');
-      
+
       const options = {
         key: key,
         amount: razorpayOrder.amount,
@@ -822,29 +854,44 @@ const app = {
         order_id: razorpayOrder.id,
         handler: async (response) => {
           try {
-            // Verify payment on backend
             await apiCall('/api/payment/verify', {
               method: 'POST',
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                orderId: order.id
+                razorpay_signature: response.razorpay_signature
               })
             });
-            
-            // Update order status
-            await apiCall(`/api/orders/${order.id}`, {
-              method: 'PUT',
+
+            const created = await apiCall('/api/orders', {
+              method: 'POST',
               body: JSON.stringify({
+                ...order,
                 paymentStatus: 'paid',
                 payment: 'razorpay',
                 status: 'approved'
               })
             });
-            
+
+            await apiCall('/api/payments', {
+              method: 'POST',
+              body: JSON.stringify({
+                id: 'TXN' + Date.now(),
+                orderId: created.id,
+                customer: order.address?.name || 'Guest',
+                amount: order.subtotal,
+                method: 'RAZORPAY',
+                status: 'approved',
+                date: new Date().toISOString(),
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature
+              })
+            });
+
+            this.orders.unshift(created);
             this.cart = [];
             this.saveData();
+            this.saveOrders();
             this.updateBadges();
             this.showToast('Payment successful! Order confirmed.', 'success');
             this.navigate('orders');
@@ -862,10 +909,10 @@ const app = {
           color: '#2874f0'
         }
       };
-      
+
       const rzp = new Razorpay(options);
       rzp.open();
-      
+
     } catch (err) {
       console.error('Razorpay initiation error:', err);
       this.showToast('Failed to initiate payment. Please try again.', 'error');
@@ -875,35 +922,60 @@ const app = {
   renderOrders() {
     const list = document.getElementById('orders-list');
     if (!list) return;
-    
+
     let orders = [...this.orders];
-    
+
     if (this.orderFilter !== 'all') {
       orders = orders.filter(o => o.status === this.orderFilter);
     }
-    
+
     if (orders.length === 0) {
       list.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><h3>No orders yet</h3><p>Start shopping to see your orders here</p></div>';
       return;
     }
-    
-    list.innerHTML = orders.map(order => `
-      <div class="order-card">
-        <div class="order-header">
-          <span class="order-id">${order.id}</span>
-          <span class="order-status ${order.status}">${order.status}</span>
+
+    list.innerHTML = orders.map(order => {
+      const canCancel = !['shipped', 'delivered', 'cancelled'].includes(order.status);
+      return `
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-id">${order.id}</span>
+            <span class="order-status ${order.status}">${order.status}</span>
+          </div>
+          <div class="order-items">
+            ${order.items.map(item => `
+              <img src="${item.images[0]}" alt="${item.name}" class="order-item-thumb" title="${item.name}">
+            `).join('')}
+          </div>
+          <div class="order-footer">
+            <span class="order-amount">₹${order.subtotal}</span>
+            <div>
+              ${canCancel ? `<button class="order-cancel-btn" onclick="event.stopPropagation(); app.cancelOrder('${order.id}')">Cancel Order</button>` : ''}
+              <button class="order-track-btn" onclick="app.showTracking('${order.id}')">Track Order</button>
+            </div>
+          </div>
         </div>
-        <div class="order-items">
-          ${order.items.map(item => `
-            <img src="${item.images[0]}" alt="${item.name}" class="order-item-thumb" title="${item.name}">
-          `).join('')}
-        </div>
-        <div class="order-footer">
-          <span class="order-amount">₹${order.subtotal}</span>
-          <button class="order-track-btn" onclick="app.showTracking('${order.id}')">Track Order</button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+  },
+
+  cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+
+    const order = this.orders.find(o => o.id == orderId);
+    if (!order) return;
+
+    apiCall(`/api/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'cancelled' })
+    }).then(() => {
+      order.status = 'cancelled';
+      this.saveOrders();
+      this.renderOrders();
+      this.showToast('Order cancelled successfully', 'success');
+    }).catch(err => {
+      this.showToast(err.error || 'Failed to cancel order', 'error');
+    });
   },
 
   showTracking(orderId) {
@@ -1121,11 +1193,16 @@ const app = {
     this.showToast('Profile updated!', 'success');
   },
 
-  logout() {
-    localStorage.removeItem('currentUser');
-    this.user = null;
-    this.showToast('Logged out successfully', 'success');
-    this.navigate('home');
+  toggleMobileCategories() {
+    const panel = document.getElementById('mobile-categories-panel');
+    const toggleBtn = document.querySelector('.mobile-category-toggle');
+    if (!panel) return;
+
+    const isOpen = panel.style.display === 'flex';
+    panel.style.display = isOpen ? 'none' : 'flex';
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('open', !isOpen);
+    }
   },
 
   // --- SEARCH & FILTER ---
@@ -1137,12 +1214,17 @@ const app = {
   filterCategory(category) {
     this.currentCategory = category;
     this.navigate('home');
-    
+
     const select = document.getElementById('filter-category');
     if (select) {
       select.value = category === 'all' ? 'all' : category;
     }
-    
+
+    document.querySelectorAll('.mobile-categories-panel .cat-chip').forEach(chip => {
+      const chipCategory = chip.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+      chip.classList.toggle('active', chipCategory === category);
+    });
+
     this.renderProducts();
   },
 
@@ -1255,7 +1337,9 @@ const app = {
     
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.user = user;
+    this.loadData();
     this.updateAuthUI();
+    this.updateBadges();
     this.showToast('Registration successful!', 'success');
     this.navigate('home');
   },
@@ -1302,7 +1386,9 @@ const app = {
     
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.user = user;
+    this.loadData();
     this.updateAuthUI();
+    this.updateBadges();
     this.showToast('Login successful!', 'success');
     this.navigate('home');
   },
@@ -1310,7 +1396,12 @@ const app = {
   logout() {
     localStorage.removeItem('currentUser');
     this.user = null;
+    this.cart = [];
+    this.wishlist = [];
+    this.orders = [];
+    this.addresses = [];
     this.updateAuthUI();
+    this.updateBadges();
     this.showToast('Logged out successfully', 'success');
     this.navigate('login');
   },

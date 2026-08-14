@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, index: true },
   items: [{ type: mongoose.Schema.Types.Mixed }],
   address: mongoose.Schema.Types.Mixed,
   payment: { type: String, default: 'cod' },
