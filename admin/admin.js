@@ -170,7 +170,7 @@ const admin = {
             const totalProducts = this.products.length;
             const totalRevenue = this.orders
                 .filter(o => (o.status === 'delivered' || o.status === 'approved') && o.paymentStatus === 'paid')
-                .reduce((sum, o) => sum + (o.subtotal || 0), 0);
+                .reduce((sum, o) => sum + (o.total || (o.subtotal || 0) + 50), 0);
             const pendingOrders = this.orders.filter(o => o.status === 'pending').length;
             const deliveredOrders = this.orders.filter(o => o.status === 'delivered').length;
 
@@ -201,7 +201,7 @@ const admin = {
         <td>${order.id}</td>
         <td>${order.address?.name || 'Guest'}</td>
         <td>${this.getOrderItemDetails(order)}</td>
-        <td>₹${order.subtotal}</td>
+        <td>₹${order.total || order.subtotal + 50}</td>
         <td><span class="order-status ${order.status}">${order.status}</span></td>
         <td>${new Date(order.date).toLocaleDateString()}</td>
         <td><button class="action-btn view" onclick="admin.showOrderModal('${order.id}')">View</button></td>
@@ -497,7 +497,7 @@ const admin = {
         <td>${order.id}</td>
         <td>${order.address?.name || 'Guest'}</td>
         <td>${this.getOrderItemDetails(order)}</td>
-        <td>₹${order.subtotal}</td>
+        <td>₹${order.total || order.subtotal + 50}</td>
         <td>${(order.payment || 'cod').toUpperCase()}</td>
         <td><span class="order-status ${order.status}">${order.status}</span></td>
         <td>${order.paymentStatus === 'paid' ? '✅ Paid' : (order.payment === 'razorpay' ? '⏳ Pending' : '💵 COD')}</td>
@@ -562,7 +562,7 @@ const admin = {
     if (!order) return;
     
     document.getElementById('razorpay-order-id').value = order.id;
-    document.getElementById('razorpay-amount').value = order.subtotal;
+    document.getElementById('razorpay-amount').value = order.total || order.subtotal + 50;
     document.getElementById('razorpay-customer').value = order.address?.name || 'Guest';
     document.getElementById('razorpay-modal').classList.add('active');
   },

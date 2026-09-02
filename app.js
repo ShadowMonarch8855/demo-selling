@@ -228,6 +228,8 @@ const defaultProducts = [{
     }
 ];
 
+const DELIVERY_CHARGE = 50;
+
 // User-specific storage helpers
 function getUserStorageKey(baseKey, user) {
     if (!user || !user.email) return baseKey;
@@ -699,7 +701,7 @@ const app = {
     
     const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const discount = this.cart.reduce((sum, item) => sum + ((item.mrp - item.price) * item.quantity), 0);
-    const delivery = subtotal > 999 ? 0 : 99;
+    const delivery = DELIVERY_CHARGE;
     const total = subtotal + delivery;
     
     list.innerHTML = this.cart.map(item => `
@@ -828,6 +830,8 @@ const app = {
       address: selectedAddress || this.addresses[0],
       payment: paymentMethod,
       subtotal: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+      deliveryCharge: DELIVERY_CHARGE,
+      total: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + DELIVERY_CHARGE,
       status: 'pending',
       date: new Date().toISOString(),
       trackingNumber: '',
@@ -871,7 +875,7 @@ const app = {
       const razorpayOrder = await apiCall('/api/payment/create-order', {
         method: 'POST',
         body: JSON.stringify({
-          amount: order.subtotal,
+          amount: order.total,
           currency: 'INR',
           receipt: order.id
         })
@@ -913,7 +917,7 @@ const app = {
                 id: 'TXN' + Date.now(),
                 orderId: created.id,
                 customer: order.address?.name || 'Guest',
-                amount: order.subtotal,
+                amount: order.total,
                 method: 'RAZORPAY',
                 status: 'approved',
                 date: new Date().toISOString(),
@@ -982,7 +986,7 @@ const app = {
             `).join('')}
           </div>
           <div class="order-footer">
-            <span class="order-amount">₹${order.subtotal}</span>
+            <span class="order-amount">₹${order.total || order.subtotal + DELIVERY_CHARGE}</span>
             <div>
               ${canCancel ? `<button class="order-cancel-btn" onclick="event.stopPropagation(); app.cancelOrder('${order.id}')">Cancel Order</button>` : ''}
               <button class="order-track-btn" onclick="app.showTracking('${order.id}')">Track Order</button>
@@ -1146,7 +1150,7 @@ const app = {
     
     const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const discount = this.cart.reduce((sum, item) => sum + ((item.mrp - item.price) * item.quantity), 0);
-    const delivery = subtotal > 999 ? 0 : 99;
+    const delivery = DELIVERY_CHARGE;
     const total = subtotal + delivery;
     
     summary.innerHTML = `
