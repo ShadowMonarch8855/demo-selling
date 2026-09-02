@@ -1,8 +1,8 @@
 // --- DATA STORE ---
 const API_BASE = (typeof window !== 'undefined' && window.APP_API_BASE) ||
-  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
-    ? 'http://localhost:10000'
-    : 'https://demo-selling.onrender.com');
+    (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ?
+        'http://localhost:10000' :
+        'https://demo-selling.onrender.com');
 const defaultProducts = [{
         id: 1,
         name: "Men's Casual Cotton T-Shirt",
@@ -228,13 +228,6 @@ const defaultProducts = [{
     }
 ];
 
-// Initialize data from localStorage or defaults
-function initData() {
-    if (!localStorage.getItem('products')) {
-        localStorage.setItem('products', JSON.stringify(defaultProducts));
-    }
-}
-
 // User-specific storage helpers
 function getUserStorageKey(baseKey, user) {
     if (!user || !user.email) return baseKey;
@@ -288,9 +281,9 @@ const app = {
         currentSlide: 0,
         slideInterval: null,
         productsCache: null,
+        pageHistory: [],
 
         async init() {
-            initData();
             await this.loadProducts();
 
             const savedUser = localStorage.getItem('currentUser');
@@ -302,7 +295,7 @@ const app = {
             this.updateAuthUI();
 
             if (!this.user) {
-                this.navigate('login');
+                this.navigate('landing');
             } else {
                 this.navigate('home');
                 this.renderProducts();
@@ -318,49 +311,45 @@ const app = {
         },
 
         async loadProducts() {
+            this.productsCache = await apiCall('/api/products');
+        },
+
+        loadData() {
+            this.cart = loadUserData('cart', this.user);
+            this.wishlist = loadUserData('wishlist', this.user);
+            this.addresses = loadUserData('addresses', this.user);
+
             if (API_BASE) {
-                try {
-                    this.productsCache = await apiCall('/api/products');
-                } catch (err) {
-                    console.warn('API fetch failed, using localStorage:', err);
-                    this.productsCache = JSON.parse(localStorage.getItem('products')) || defaultProducts;
-                }
+                const userParam = this.user && this.user.email ? `?userId=${encodeURIComponent(this.user.email)}` : '';
+                apiCall(`/api/orders${userParam}`).then(orders => {
+                    this.orders = orders;
+                    if (this.currentPage === 'orders') {
+                        this.renderOrders();
+                    }
+                }).catch(() => {
+                    this.orders = [];
+                });
             } else {
-                this.productsCache = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+                this.orders = [];
             }
         },
 
-  loadData() {
-    this.cart = loadUserData('cart', this.user);
-    this.wishlist = loadUserData('wishlist', this.user);
-    this.addresses = loadUserData('addresses', this.user);
+        saveData() {
+            saveUserData('cart', this.cart, this.user);
+            saveUserData('wishlist', this.wishlist, this.user);
+            saveUserData('addresses', this.addresses, this.user);
+        },
 
-    if (API_BASE) {
-      const userParam = this.user?.email ? `?userId=${encodeURIComponent(this.user.email)}` : '';
-      apiCall(`/api/orders${userParam}`).then(orders => {
-        this.orders = orders;
-        if (this.currentPage === 'orders') {
-          this.renderOrders();
-        }
-      }).catch(() => {
-        this.orders = loadUserData('orders', this.user);
-      });
-    } else {
-      this.orders = loadUserData('orders', this.user);
-    }
-  },
+        saveOrders() {},
 
-  saveData() {
-    saveUserData('cart', this.cart, this.user);
-    saveUserData('wishlist', this.wishlist, this.user);
-    saveUserData('addresses', this.addresses, this.user);
-  },
-
-  saveOrders() {
-    saveUserData('orders', this.orders, this.user);
-  },
-
-        navigate(page) {
+        navigate(page, options = {}) {
+            const previousPage = this.currentPage;
+            if (!this.user && page !== 'landing' && page !== 'login') {
+                page = 'landing';
+            }
+            if (!options.skipHistory && previousPage !== page && document.getElementById(`page-${previousPage}`)) {
+                this.pageHistory.push(previousPage);
+            }
             this.currentPage = page;
 
             const panel = document.getElementById('mobile-categories-panel');
@@ -378,7 +367,11 @@ const app = {
             const target = document.getElementById(`page-${page}`);
             if (target) {
                 target.classList.add('active');
+                this.addPageBackButton(target, page);
             }
+
+            document.body.classList.toggle('landing-mode', page === 'landing');
+            document.body.classList.toggle('login-mode', page === 'login');
 
             this.closeModal();
 
@@ -406,8 +399,27 @@ const app = {
             window.scrollTo(0, 0);
         },
 
+        addPageBackButton(pageElement, page) {
+            let backButton = pageElement.querySelector('.page-back-button');
+            if (!backButton) {
+                backButton = document.createElement('button');
+                backButton.className = 'page-back-button';
+                backButton.type = 'button';
+                backButton.setAttribute('aria-label', 'Go back');
+                backButton.title = 'Go back';
+                pageElement.prepend(backButton);
+            }
+            backButton.hidden = page === 'login' || page === 'home';
+            backButton.onclick = () => this.goBack();
+        },
+
+        goBack() {
+            const previousPage = this.pageHistory.pop();
+            this.navigate(previousPage || 'home', { skipHistory: true });
+        },
+
         getProducts() {
-            return this.productsCache || JSON.parse(localStorage.getItem('products')) || defaultProducts;
+            return this.productsCache || [];
         },
 
         renderProducts() {
@@ -417,7 +429,8 @@ const app = {
             let products = this.getProducts();
 
             // Apply search
-            const searchQuery = document.getElementById('search-input')?.value.toLowerCase();
+            const searchInput = document.getElementById('search-input');
+            const searchQuery = searchInput && searchInput.value.toLowerCase();
             if (searchQuery) {
                 products = products.filter(p =>
                     p.name.toLowerCase().includes(searchQuery) ||
@@ -432,10 +445,14 @@ const app = {
             }
 
             // Apply other filters
-            const sizeFilter = document.getElementById('filter-size')?.value;
-            const colorFilter = document.getElementById('filter-color')?.value;
-            const priceFilter = document.getElementById('filter-price')?.value;
-            const sortFilter = document.getElementById('filter-sort')?.value;
+            const sizeInput = document.getElementById('filter-size');
+            const colorInput = document.getElementById('filter-color');
+            const priceInput = document.getElementById('filter-price');
+            const sortInput = document.getElementById('filter-sort');
+            const sizeFilter = sizeInput && sizeInput.value;
+            const colorFilter = colorInput && colorInput.value;
+            const priceFilter = priceInput && priceInput.value;
+            const sortFilter = sortInput && sortInput.value;
 
             if (sizeFilter && sizeFilter !== 'all') {
                 products = products.filter(p => p.sizes && p.sizes.includes(sizeFilter));
@@ -504,7 +521,7 @@ const app = {
             <span class="rating-badge">${product.rating}</span>
             <span>★</span>
           </div>
-          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart('${product.id}')">ADD TO CART</button>
+          <button class="add-cart-btn" onclick="event.stopPropagation(); app.showProductModal('${product.id}')">ADD TO CART</button>
         </div>
       `;
                 grid.appendChild(card);
@@ -512,7 +529,7 @@ const app = {
         },
 
         loadMore() {
-          this.renderProducts();
+            this.renderProducts();
         },
 
         showProductModal(productId) {
@@ -548,21 +565,21 @@ const app = {
         <div class="option-group">
           <label>Size:</label>
           <div class="size-options">
-            ${product.sizes.map(size => `
-              <button class="size-btn" onclick="app.selectSize(this)">${size}</button>
+              ${product.sizes.map(size => `
+                <button class="size-btn" data-size="${size}" onclick="app.selectSize(this)">${size}</button>
             `).join('')}
           </div>
         </div>
         <div class="option-group">
           <label>Color:</label>
           <div class="color-options">
-            ${product.colors.map(color => `
-              <div class="color-btn" style="background:${this.getColorCode(color)}" title="${color}" onclick="app.selectColor(this)"></div>
+              ${product.colors.map(color => `
+                <div class="color-btn" data-color="${color}" style="background:${this.getColorCode(color)}" title="${color}" onclick="app.selectColor(this)"></div>
             `).join('')}
           </div>
         </div>
         <div class="detail-actions">
-          <button class="btn-primary" onclick="app.addToCart('${product.id}'); app.closeModal();">ADD TO CART</button>
+          <button class="btn-primary" onclick="if (app.addToCart('${product.id}')) app.closeModal();">ADD TO CART</button>
           <button class="btn-secondary" onclick="app.toggleWishlist('${product.id}')">
             ${inWishlist ? '❤️ WISHLISTED' : '🤍 ADD TO WISHLIST'}
           </button>
@@ -622,11 +639,19 @@ const app = {
     const product = products.find(p => p.id == productId);
     if (!product) return;
     
-    const existingItem = this.cart.find(item => item.id == productId);
+    const selectedSize = document.querySelector('.size-btn.selected')?.dataset.size;
+    const selectedColor = document.querySelector('.color-btn.selected')?.dataset.color;
+    if (!selectedSize || !selectedColor) {
+      this.showToast('Please select a size and color before adding to cart', 'error');
+      return false;
+    }
+
+    const variantKey = `${productId}-${selectedSize}-${selectedColor}`;
+    const existingItem = this.cart.find(item => item.cartKey === variantKey);
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
-      this.cart.push({ ...product, quantity: 1 });
+      this.cart.push({ ...product, size: selectedSize, color: selectedColor, cartKey: variantKey, quantity: 1 });
     }
     
     this.saveData();
@@ -636,17 +661,18 @@ const app = {
     if (this.currentPage === 'cart') {
       this.renderCart();
     }
+    return true;
   },
 
   removeFromCart(productId) {
-    this.cart = this.cart.filter(item => item.id != productId);
+    this.cart = this.cart.filter(item => (item.cartKey || String(item.id)) !== String(productId));
     this.saveData();
     this.updateBadges();
     this.renderCart();
   },
 
   updateCartQuantity(productId, delta) {
-    const item = this.cart.find(item => item.id == productId);
+    const item = this.cart.find(item => (item.cartKey || String(item.id)) === String(productId));
     if (item) {
       item.quantity += delta;
       if (item.quantity <= 0) {
@@ -654,6 +680,7 @@ const app = {
         return;
       }
     }
+    if (!item) return;
     this.saveData();
     this.updateBadges();
     this.renderCart();
@@ -680,13 +707,14 @@ const app = {
         <img src="${item.images[0]}" alt="${item.name}" class="cart-item-img">
         <div class="cart-item-info">
           <div class="cart-item-title">${item.name}</div>
+          <div class="cart-item-variant">Size: ${item.size || 'Not selected'} | Color: ${item.color || 'Not selected'}</div>
           <div class="cart-item-price">₹${item.price}</div>
           <div class="cart-item-qty">
-            <button class="qty-btn" onclick="app.updateCartQuantity('${item.id}', -1)">-</button>
+            <button class="qty-btn" onclick="app.updateCartQuantity('${item.cartKey || item.id}', -1)">-</button>
             <span class="qty-value">${item.quantity}</span>
-            <button class="qty-btn" onclick="app.updateCartQuantity('${item.id}', 1)">+</button>
+            <button class="qty-btn" onclick="app.updateCartQuantity('${item.cartKey || item.id}', 1)">+</button>
           </div>
-          <button class="cart-item-remove" onclick="app.removeFromCart('${item.id}')">REMOVE</button>
+          <button class="cart-item-remove" onclick="app.removeFromCart('${item.cartKey || item.id}')">REMOVE</button>
         </div>
       </div>
     `).join('');
@@ -762,7 +790,7 @@ const app = {
             <span class="rating-badge">${product.rating}</span>
             <span>★</span>
           </div>
-          <button class="add-cart-btn" onclick="event.stopPropagation(); app.addToCart('${product.id}')">ADD TO CART</button>
+          <button class="add-cart-btn" onclick="event.stopPropagation(); app.showProductModal('${product.id}')">ADD TO CART</button>
         </div>
       </div>
     `).join('');
@@ -772,6 +800,12 @@ const app = {
   async placeOrder() {
     if (this.cart.length === 0) {
       this.showToast('Your cart is empty!', 'error');
+      return;
+    }
+
+    if (this.cart.some(item => !item.size || !item.color)) {
+      this.showToast('Please select a size and color for every item before proceeding', 'error');
+      this.navigate('cart');
       return;
     }
 
@@ -1272,9 +1306,11 @@ const app = {
     const wishlistCount = this.wishlist.length;
     
     const cartEl = document.getElementById('cart-count');
+    const cartBottomEl = document.getElementById('cart-count-bottom');
     const wishlistEl = document.getElementById('wishlist-count');
     
     if (cartEl) cartEl.textContent = cartCount;
+    if (cartBottomEl) cartBottomEl.textContent = cartCount;
     if (wishlistEl) wishlistEl.textContent = wishlistCount;
   },
 
@@ -1403,14 +1439,14 @@ const app = {
     this.updateAuthUI();
     this.updateBadges();
     this.showToast('Logged out successfully', 'success');
-    this.navigate('login');
+    this.navigate('landing');
   },
 
   handleProfileClick() {
     if (this.user) {
       this.navigate('profile');
     } else {
-      this.navigate('login');
+      this.navigate('landing');
     }
   },
 
