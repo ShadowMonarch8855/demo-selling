@@ -1205,13 +1205,22 @@ body.login-mode main {
 }
 
 .color-btn {
-    width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
     height: 32px;
-    border-radius: 50%;
+    padding: 0 10px;
+    border-radius: 16px;
     border: 2px solid #fff;
     box-shadow: 0 0 0 1px #d4d4d4;
     cursor: pointer;
     transition: all 0.2s;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    white-space: nowrap;
 }
 
 .color-btn:hover,

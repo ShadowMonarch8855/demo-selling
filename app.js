@@ -574,11 +574,13 @@ const app = {
         </div>
         <div class="option-group">
           <label>Color:</label>
-          <div class="color-options">
-              ${product.colors.map(color => `
-                <div class="color-btn" data-color="${color}" style="background:${this.getColorCode(color)}" title="${color}" onclick="app.selectColor(this)"></div>
-            `).join('')}
-          </div>
+                <div class="color-options">
+                  ${product.colors.map(color => `
+                    <div class="color-btn" data-color="${color}" style="background:${this.getColorCode(color)}" title="${color}" onclick="app.selectColor(this)">
+                      <span class="color-name">${color}</span>
+                    </div>
+                  `).join('')}
+                </div>
         </div>
         <div class="detail-actions">
           <button class="btn-primary" onclick="if (app.addToCart('${product.id}')) app.closeModal();">ADD TO CART</button>
