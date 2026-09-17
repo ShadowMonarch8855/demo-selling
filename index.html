@@ -115,42 +115,215 @@
     <main id="main-content">
         <!-- New visitor landing page -->
         <div id="page-landing" class="page active">
-            <section class="landing-page">
-                <div class="landing-image"></div>
-                <div class="landing-content">
+            <!-- Announcement -->
+            <div class="landing-announcement">
+                <span>Free shipping on orders above ₹999 | Use code <strong>VASTRA10</strong> for 10% off</span>
+            </div>
+
+            <!-- Landing Nav -->
+            <nav class="landing-nav">
+                <a href="#" class="landing-logo" onclick="app.navigate('landing'); return false;">
+                    <span class="logo-icon">👗</span> VastraKart
+                </a>
+                <div class="landing-nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#categories">Categories</a>
+                    <a href="#reviews">Reviews</a>
+                    <button class="landing-nav-btn" onclick="app.navigate('login')">Sign In</button>
+                </div>
+            </nav>
+
+            <!-- Hero -->
+            <section class="landing-hero">
+                <div class="landing-hero-content">
                     <p class="landing-kicker">VASTRAKART / 2025 COLLECTION</p>
-                    <h1>Wear the<br><em>unspoken.</em></h1>
+                    <h1>Wear the <em>unspoken.</em></h1>
                     <p class="landing-copy">Quiet confidence, considered silhouettes, and pieces made to stay with you.</p>
                     <div class="landing-actions">
                         <button class="landing-primary" onclick="app.setLoginTab(document.querySelector('.login-tab'), 'register'); app.navigate('login')">Create an account</button>
                         <button class="landing-secondary" onclick="app.navigate('login')">Sign in <span aria-hidden="true">&rarr;</span></button>
                     </div>
-                    <div class="landing-note"><span></span> A slower approach to getting dressed</div>
+                    <div class="landing-hero-stats">
+                        <div><strong>50K+</strong><span>Happy Customers</span></div>
+                        <div><strong>10K+</strong><span>Products</span></div>
+                        <div><strong>4.8★</strong><span>Rating</span></div>
+                    </div>
+                </div>
+                <div class="landing-hero-image"></div>
+            </section>
+
+            <!-- Features -->
+            <section class="landing-features" id="features">
+                <div class="container">
+                    <h2 class="section-title">Why shop with us</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <span class="feature-icon">✨</span>
+                            <h3>Curated Collection</h3>
+                            <p>Handpicked styles from top brands</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">🚚</span>
+                            <h3>Free Delivery</h3>
+                            <p>On orders above ₹999</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">↩️</span>
+                            <h3>Easy Returns</h3>
+                            <p>7-day easy return policy</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">🔒</span>
+                            <h3>Secure Payment</h3>
+                            <p>100% secure checkout</p>
+                        </div>
+                    </div>
                 </div>
             </section>
-            <section class="landing-highlights" aria-label="VastraKart highlights">
-                <div class="landing-highlight">
-                    <span class="highlight-number">01</span>
-                    <div>
-                        <h2>Curated edits</h2>
-                        <p>Thoughtful pieces for every version of you.</p>
-                    </div>
-                </div>
-                <div class="landing-highlight">
-                    <span class="highlight-number">02</span>
-                    <div>
-                        <h2>Made to arrive</h2>
-                        <p>Reliable delivery, carefully packed and tracked.</p>
-                    </div>
-                </div>
-                <div class="landing-highlight">
-                    <span class="highlight-number">03</span>
-                    <div>
-                        <h2>Easy by design</h2>
-                        <p>Simple checkout with secure online payments.</p>
+
+            <!-- Categories -->
+            <section class="landing-categories" id="categories">
+                <div class="container">
+                    <h2 class="section-title">Shop by Category</h2>
+                    <div class="categories-grid">
+                        <div class="category-card" onclick="app.navigate('login')">
+                            <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&q=80" alt="Men">
+                            <span>Men</span>
+                        </div>
+                        <div class="category-card" onclick="app.navigate('login')">
+                            <img src="https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&q=80" alt="Women">
+                            <span>Women</span>
+                        </div>
+                        <div class="category-card" onclick="app.navigate('login')">
+                            <img src="https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&q=80" alt="Kids">
+                            <span>Kids</span>
+                        </div>
+                        <div class="category-card" onclick="app.navigate('login')">
+                            <img src="https://images.unsplash.com/photo-1610030302048-dbe1a5c5e4e4?w=400&q=80" alt="Ethnic">
+                            <span>Ethnic Wear</span>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <!-- Stats -->
+            <section class="landing-stats">
+                <div class="container">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <strong>50K+</strong>
+                            <span>Happy Customers</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>10K+</strong>
+                            <span>Products</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>500+</strong>
+                            <span>Brands</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>4.8★</strong>
+                            <span>App Rating</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials -->
+            <section class="landing-testimonials" id="reviews">
+                <div class="container">
+                    <h2 class="section-title">What our customers say</h2>
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p>"Amazing collection and super fast delivery. Quality is top notch!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">A</div>
+                                <div>
+                                    <strong>Aarav S.</strong>
+                                    <span>Verified Buyer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p>"Loved the ethnic wear collection. Got so many compliments!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">P</div>
+                                <div>
+                                    <strong>Priya M.</strong>
+                                    <span>Verified Buyer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p>"Easy returns and great customer support. My go-to fashion store."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">R</div>
+                                <div>
+                                    <strong>Rahul K.</strong>
+                                    <span>Verified Buyer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="landing-cta">
+                <div class="container">
+                    <div class="landing-cta-content">
+                        <h2>Ready to elevate your style?</h2>
+                        <p>Join thousands of happy shoppers. Create your free account today.</p>
+                        <button class="landing-primary" onclick="app.setLoginTab(document.querySelector('.login-tab'), 'register'); app.navigate('login')">Get Started</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="landing-footer">
+                <div class="container">
+                    <div class="landing-footer-grid">
+                        <div class="landing-footer-col">
+                            <h4>ABOUT VastraKart</h4>
+                            <p>India's fashion destination for the latest trends at best prices. Shop from a wide range of clothing for men, women, and kids.</p>
+                        </div>
+                        <div class="landing-footer-col">
+                            <h4>HELP</h4>
+                            <ul>
+                                <li><a href="#">FAQ</a></li>
+                                <li><a href="#">Terms & Conditions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">E-waste Recycling</a></li>
+                            </ul>
+                        </div>
+                        <div class="landing-footer-col">
+                            <h4>SHOP BY</h4>
+                            <ul>
+                                <li><a href="#" onclick="app.filterCategory('Men'); return false;">Men</a></li>
+                                <li><a href="#" onclick="app.filterCategory('Women'); return false;">Women</a></li>
+                                <li><a href="#" onclick="app.filterCategory('Kids'); return false;">Kids</a></li>
+                                <li><a href="#" onclick="app.filterCategory('Ethnic'); return false;">Ethnic Wear</a></li>
+                            </ul>
+                        </div>
+                        <div class="landing-footer-col">
+                            <h4>CONSUMER POLICY</h4>
+                            <ul>
+                                <li><a href="#">Return Policy</a></li>
+                                <li><a href="#">Cancellation Policy</a></li>
+                                <li><a href="#">Shipping Policy</a></li>
+                                <li><a href="#">Grievance Redressal</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="landing-footer-bottom">
+                        <p>© 2025 VastraKart. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
         </div>
 
         <!-- Login Page -->
