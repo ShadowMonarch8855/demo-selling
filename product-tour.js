@@ -66,6 +66,7 @@
     })();
     return driverLoadPromise;
   }
+  let driver = null;
   let tourActive = false;
   let boundClickListener = null;
 
