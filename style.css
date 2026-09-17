@@ -844,10 +844,10 @@ textarea {
 
 body.landing-mode .header,
 body.landing-mode .mobile-bottom-nav,
-body.landing-mode main > .footer,
+body.landing-mode .footer,
 body.login-mode .header,
 body.login-mode .mobile-bottom-nav,
-body.login-mode main > .footer {
+body.login-mode .footer {
     display: none;
 }
 
