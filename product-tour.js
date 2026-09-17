@@ -2,7 +2,70 @@
   'use strict';
 
   const TOUR_KEY = 'hasSeenShoppingTour';
-  let driver = null;
+  const DRIVER_CDNS = [
+    'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/driver.js',
+    'https://unpkg.com/driver.js@1.0.1/driver.js'
+  ];
+  const DRIVER_CSS_CDNS = [
+    'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/driver.css',
+    'https://unpkg.com/driver.js@1.0.1/driver.css'
+  ];
+  let driverLoadPromise = null;
+
+  function injectCSS() {
+    return new Promise((resolve) => {
+      const existing = document.querySelector('link[href*="driver.css"]');
+      if (existing) return resolve();
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = DRIVER_CSS_CDNS[0];
+      link.onload = resolve;
+      link.onerror = () => {
+        if (DRIVER_CSS_CDNS[1]) {
+          link.href = DRIVER_CSS_CDNS[1];
+          link.onload = resolve;
+          link.onerror = () => resolve();
+        } else {
+          resolve();
+        }
+      };
+      document.head.appendChild(link);
+    });
+  }
+
+  function loadDriverScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureDriverLoaded() {
+    if (typeof Driver !== 'undefined') {
+      return Promise.resolve();
+    }
+    if (driverLoadPromise) {
+      return driverLoadPromise;
+    }
+    driverLoadPromise = (async () => {
+      await injectCSS();
+      for (const src of DRIVER_CDNS) {
+        try {
+          await loadDriverScript(src);
+          if (typeof Driver !== 'undefined') {
+            return;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+      console.warn('Driver.js failed to load from all CDNs');
+    })();
+    return driverLoadPromise;
+  }
   let tourActive = false;
   let boundClickListener = null;
 
@@ -105,9 +168,11 @@
     document.body.appendChild(btn);
   }
 
-  function startTour() {
+  async function startTour() {
+    await ensureDriverLoaded();
     if (typeof Driver === 'undefined') {
       console.warn('Driver.js is not loaded');
+      markTourSeen();
       return;
     }
     if (tourActive) return;
