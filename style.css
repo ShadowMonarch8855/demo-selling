@@ -78,12 +78,19 @@ textarea {
     color: #fff;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     white-space: nowrap;
 }
 
 .logo-icon {
     font-size: 1.8rem;
+    line-height: 1;
+}
+
+.logo-icon img {
+    height: 32px;
+    width: auto;
+    display: block;
 }
 
 .search-bar {
@@ -156,8 +163,8 @@ textarea {
     .logo {
         font-size: 1.2rem;
     }
-    .logo-icon {
-        font-size: 1.4rem;
+    .logo-icon img {
+        height: 24px;
     }
     .search-bar {
         order: 3;
@@ -322,7 +329,13 @@ textarea {
     color: #fffdf9;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+}
+
+.landing-logo .logo-icon img {
+    height: 32px;
+    width: auto;
+    display: block;
 }
 
 .landing-nav-links {
@@ -2910,6 +2923,15 @@ body {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 1.7rem;
     letter-spacing: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon img {
+    height: 36px;
+    width: auto;
+    display: block;
 }
 
 .search-bar {
@@ -3555,8 +3577,8 @@ body {
     .logo {
         font-size: 1.1rem;
     }
-    .logo-icon {
-        font-size: 1.2rem;
+    .logo-icon img {
+        height: 22px;
     }
     .search-bar {
         order: 3;
