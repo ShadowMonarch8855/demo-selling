@@ -383,4 +383,8 @@
   }
 
   window.startShoppingTour = startTour;
+  window.resetShoppingTour = function() {
+    localStorage.removeItem(TOUR_KEY);
+    location.reload();
+  };
 })();
