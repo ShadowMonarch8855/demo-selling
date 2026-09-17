@@ -3,12 +3,12 @@
 
   const TOUR_KEY = 'hasSeenShoppingTour';
   const DRIVER_CDNS = [
-    'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/driver.js',
-    'https://unpkg.com/driver.js@1.0.1/driver.js'
+    'https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.js',
+    'https://unpkg.com/driver.js@0.9.8/dist/driver.min.js'
   ];
   const DRIVER_CSS_CDNS = [
-    'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/driver.css',
-    'https://unpkg.com/driver.js@1.0.1/driver.css'
+    'https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css',
+    'https://unpkg.com/driver.js@0.9.8/dist/driver.min.css'
   ];
   let driverLoadPromise = null;
 
@@ -172,7 +172,6 @@
     await ensureDriverLoaded();
     if (typeof Driver === 'undefined') {
       console.warn('Driver.js is not loaded');
-      markTourSeen();
       return;
     }
     if (tourActive) return;

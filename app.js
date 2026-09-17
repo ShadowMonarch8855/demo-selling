@@ -870,7 +870,25 @@ const app = {
     }
   },
 
+  loadRazorpayScript() {
+    return new Promise((resolve) => {
+      if (typeof Razorpay !== 'undefined') {
+        return resolve();
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = resolve;
+      script.onerror = () => resolve();
+      document.head.appendChild(script);
+    });
+  },
+
   async initiateRazorpayPayment(order) {
+    await this.loadRazorpayScript();
+    if (typeof Razorpay === 'undefined') {
+      this.showToast('Payment gateway failed to load. Please try again.', 'error');
+      return;
+    }
     try {
       const razorpayOrder = await apiCall('/api/payment/create-order', {
         method: 'POST',
